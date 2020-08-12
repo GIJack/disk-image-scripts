@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#
 # Shrink-wrap an image to its smallest possible size. see help
 # Only works with ext4 and only works with single partitioned images
 # For use with mount_image.sh
