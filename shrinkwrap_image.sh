@@ -14,7 +14,7 @@ ROOT_METHOD="sudo"
 
 help_and_exit(){
   cat 1>&2 << EOF
-image_shrinkwrap.sh:
+shrinkwrap_image.sh:
 
 "Shrink Wrap" a system image for export. Reduce an disk image file to
 its smallest possible size.
@@ -24,13 +24,13 @@ WARNING: This tool makes the assumption:
 2. The partition is ext4
 3. It is a raw disk image
 
-USAGE: image_shrinkwrap.sh <file.img>
+USAGE: shrinkwrap_image.sh <file.img>
 
 EOF
   exit 4
 }
 message(){
-  echo "image_shrinkwrap.sh: ${@}"
+  echo "shrinkwrap_image.sh: ${@}"
 }
 
 submsg(){
@@ -38,11 +38,11 @@ submsg(){
 }
 
 warn(){
-  echo 1>&2 "image_shrinkwrap.sh: WARN: ${@}"
+  echo 1>&2 "shrinkwrap_image.sh: WARN: ${@}"
 }
 
 exit_with_error(){
-  echo 1>&2 "image_shrinkwrap.sh: ERROR: ${2}"
+  echo 1>&2 "shrinkwrap_image.sh: ERROR: ${2}"
   exit ${1}
 }
 
