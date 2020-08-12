@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-
+#
+#
 COMMAND="${1}"
 FILENAME="${2}"
 LOOP_DEV=loop1
@@ -10,11 +11,12 @@ help_and_exit(){
   cat 1>&2 << EOF
 mount_image.sh:
 
-Mount and dismount qemu images
+Mount and dismount raw disk images. assumes a single parition in the
+file.
 
 USAGE: mount_image.sh <command> <file.img>
 
-Commands: mount umount ls
+Commands: mount umount list
 
 EOF
   exit 2
@@ -73,7 +75,7 @@ main() {
     umount)
       _umount-img || exit_with_error 1 "Could Not unmount ${MOUNT_POINT}"
       ;;
-    ls)
+    list)
       list-mounts || exit_with_error 1 "Couldn't list mounts???"
       ;;
     *)
