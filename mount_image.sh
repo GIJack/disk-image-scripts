@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #
+# Mount a disk img(.img) See help below
 #
+# error codes 0:Success 1:Operations Fail 2:Abort 4:Invalid User Input
 COMMAND="${1}"
 FILENAME="${2}"
 LOOP_DEV=$(losetup -f)
@@ -23,9 +25,11 @@ Commands: mount umount list
     mount: mount_image mount <filename.img>
     
     umount: mount_image.sh umount <n>
+    
+    list: list mounted images. gives Numbers <n> to use with umount
 
 EOF
-  exit 2
+  exit 4
 }
 message(){
   echo "mount_image.sh: ${@}"
