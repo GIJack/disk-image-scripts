@@ -25,13 +25,15 @@ Create an disk .img file, with a single parition and a file system. Creates a
 file of an arbitrary size, formats it with the ext4 filesystem. Takes one
 parameter, filename.
 
+Default file size is 20GB.
+
 	USAGE:
 	
 	init_image [-s <size>] <filename.img>
 	
 	OPTIONS:
 	
-	-s,--size	Size of image, in Megabytes
+	-s,--size	Size of image, in Megabytes, defaults to 20GB
 
 EOF
   exit 4
