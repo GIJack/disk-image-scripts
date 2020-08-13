@@ -11,7 +11,8 @@
 # Defaults #
 LOOP_DEV=$(losetup -f)
 PART_N=1
-MOUNT_POINT="${HOME}/mnt"
+#MOUNT_POINT="${HOME}/mnt"
+MOUNT_POINT="$(mktemp -d)"
 ROOT_METHOD="sudo"
 # /Defaults #
 
