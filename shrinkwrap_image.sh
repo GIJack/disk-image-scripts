@@ -20,7 +20,8 @@ help_and_exit(){
 shrinkwrap_image.sh:
 
 "Shrink Wrap" a system image for export. Reduce an disk image file to
-its smallest possible size.
+its smallest possible size. This is so this .img can be exported, and
+then re-imported into things such as being a cloud VM template
 
 WARNING: This tool makes the assumption:
 1. There is one partition

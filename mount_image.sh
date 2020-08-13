@@ -16,13 +16,16 @@ mount_image.sh:
 
 Mount and dismount raw disk images. assumes a single parition in the
 file. n is the number of the loop device, as shown in list. An image
-needs to be a paritioned disk image
+needs to be a paritioned disk image.
+
+Image is mounted on $HOME/mnt. You can change this at the top of the
+script
 
 USAGE: mount_image.sh <command> [file.img|n]
 
 Commands: mount umount list
 
-    mount: mount_image mount <filename.img>
+    mount: mount_image.sh mount <filename.img>
     
     umount: mount_image.sh umount <n>
     
