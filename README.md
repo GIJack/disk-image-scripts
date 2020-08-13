@@ -1,10 +1,11 @@
 # disk-image-scripts
 A collection of shell scripts for working with raw disk image .img files with
-bootable systems inside. We assume these files have been formated as raw disks.
-It is also assumed that:
-1. Each file is formated with fdisk and a parition table is added
-2. there is a single partition that takes up the entire file
-3. the filesystem is formated ext4t. We might support xfs or f2fs in the future
+bootable systems inside. Assumed that:
+1. Formatted with an MBR paritioning scheme and boot record.
+2. contains a single parition filling the entire drive, formated with a FS
+
+Right now, only MBR partitioning and ext4 filesystem are supported. In the
+future we may support GPT paritioning and xfs filesystems as well.
 
 This is intended for installing Arch Linux systems in files instead of disks,
 and working with and maintaining these installs. works hand in hand with
@@ -19,3 +20,6 @@ mount_image.sh - mount or unmount a previously made image
 
 image_shrinkwrap.sh - reduce an .img to its smallest possible size. Especially
 for export.
+
+init_image.sh - create a blank image file, formated with a single parition and a
+filesystem
