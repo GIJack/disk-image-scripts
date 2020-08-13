@@ -9,7 +9,7 @@
 # error codes 0:Success 1:Operations Fail 2:Abort 4:Invalid User Input
 
 # Defaults #
-LOOP_DEV=loop1
+LOOP_DEV=$(losetup -f)
 PART_N=1
 MOUNT_POINT="${HOME}/mnt"
 ROOT_METHOD="sudo"
@@ -67,32 +67,32 @@ as_root(){
 _setup-loop() {
   local -i local_exit=0
   local filename="${1}"
-  submsg "Setting up loop: ${filename} on /dev/${LOOP_DEV}"
+  submsg "Setting up loop: ${filename} on ${LOOP_DEV}"
   as_root losetup -P ${LOOP_DEV} "${filename}" || local_exit+=1
   return ${local_exit}
 }
 
 _destroy-loop() {
   local -i local_exit=0
-  submsg "Destroying loop: /dev/${LOOP_DEV}"
-  as_root losetup -d /dev/${LOOP_DEV} &> /dev/null || local_exit+=1
+  submsg "Destroying loop: ${LOOP_DEV}"
+  as_root losetup -d ${LOOP_DEV} &> /dev/null || local_exit+=1
   return ${local_exit}
 }
 
 cleanup_abort_fail() {
   local message="${1}"
-  as_root umount -f /dev/${LOOP_DEV}p${PART_N} &> /dev/null
-  as_root losetup -D /dev/${LOOP_DEV}
+  as_root umount -f ${LOOP_DEV}p${PART_N} &> /dev/null
+  as_root losetup -D ${LOOP_DEV}
   exit_with_error 2 "${message}"
 }
 
 _defrag() {
   local -i local_exit=0
   submsg "Defragment"
-  as_root e2fsck -f /dev/${LOOP_DEV}p${PART_N} &> /dev/null #|| local_exit+=1
-  as_root mount /dev/${LOOP_DEV}p${PART_N} "${MOUNT_POINT}" || local_exit+=1
+  as_root e2fsck -f ${LOOP_DEV}p${PART_N} &> /dev/null #|| local_exit+=1
+  as_root mount ${LOOP_DEV}p${PART_N} "${MOUNT_POINT}" || local_exit+=1
   as_root e4defrag "${MOUNT_POINT}" &> /dev/null || local_exit+=1
-  as_root umount /dev/${LOOP_DEV}p${PART_N} || local_exit+=1
+  as_root umount ${LOOP_DEV}p${PART_N} || local_exit+=1
   return ${local_exit}
 }
 
@@ -106,10 +106,10 @@ _resize_part() {
   submsg "Shrinking Partition"
   ## Shrink the filesystem
   # Check first
-  as_root e2fsck -fp /dev/${LOOP_DEV}p${PART_N}  &> /dev/null || local_exit+=1
+  as_root e2fsck -fp ${LOOP_DEV}p${PART_N}  &> /dev/null || local_exit+=1
 
   # Grab size reported directly fromr resize2fs
-  fs_size=$( as_root resize2fs -M /dev/${LOOP_DEV}p${PART_N} 2> /dev/null | tail -2 | cut -d " " -f 7 )
+  fs_size=$( as_root resize2fs -M ${LOOP_DEV}p${PART_N} 2> /dev/null | tail -2 | cut -d " " -f 7 )
   fs_size=$(( $fs_size * 4096 )) # convert 4k blocks to bytes
   disk_end=$(( $fs_size + $fs_null_space ))
 
@@ -121,7 +121,7 @@ _resize_part() {
   # the best way of doing things or why the --script option doesn't
   # override all the confirm prompts
   # https://unix.stackexchange.com/questions/190317/gnu-parted-resizepart-in-script
-  as_root parted ---pretend-input-tty /dev/${LOOP_DEV} &> /dev/null << EOF
+  as_root parted ---pretend-input-tty ${LOOP_DEV} &> /dev/null << EOF
 resizepart
 1
 ${part_end}B
@@ -178,7 +178,7 @@ main() {
 
   _destroy-loop
 if [ ${?} -ne 0 ];then
-    warn "Could not stop loop device /dev/${LOOP_DEV}, you should do this manually"
+    warn "Could not stop loop device ${LOOP_DEV}, you should do this manually"
     exit_code+=1
 fi
 
