@@ -83,6 +83,7 @@ cleanup_abort_fail() {
   local message="${1}"
   as_root umount -f ${LOOP_DEV}p${PART_N} &> /dev/null
   as_root losetup -D ${LOOP_DEV}
+  rmdir ${MOUNT_POINT} # mktemp directory
   exit_with_error 2 "${message}"
 }
 
