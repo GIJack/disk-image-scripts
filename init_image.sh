@@ -11,7 +11,7 @@ IMG_SIZE=20480 # 20GB
 # bytestream to use for initial creation. Defaults to all zeros
 FILL_SRC=/dev/zero
 
-LOOP_DEV=loop1
+LOOP_DEV=$(losetup -f)
 PART_N=1
 MOUNT_POINT="${HOME}/mnt"
 ROOT_METHOD="sudo"
@@ -90,21 +90,21 @@ switch_checker() {
 
 abort_cleanup() {
   rm "${OUTFILE}"
-  as_root losetup -d /dev/${LOOP_DEV} &> /dev/null
+  as_root losetup -d ${LOOP_DEV} &> /dev/null
   exit_with_error 2 "INTERRUPT: ABORT!"
 }
 
 _setup-loop() {
   local -i local_exit=0
-  submsg "Setting up loop: ${OUT_FILE} on /dev/${LOOP_DEV} "
+  submsg "Setting up loop: ${OUT_FILE} on ${LOOP_DEV}"
   as_root losetup -P ${LOOP_DEV} "${OUT_FILE}" || local_exit+=1
   return ${local_exit}
 }
 
 _destroy-loop() {
   local -i local_exit=0
-  submsg "Destroying /dev/${LOOP_DEV}"
-  as_root losetup -d /dev/${LOOP_DEV} &> /dev/null || local_exit+=1
+  submsg "Destroying ${LOOP_DEV}"
+  as_root losetup -d ${LOOP_DEV} &> /dev/null || local_exit+=1
   return ${local_exit}
 }
 
@@ -126,8 +126,8 @@ _partition() {
   local -i offset=2048 #first 2048 sectors
   
   submsg "Partitioning image"
-  as_root parted --script /dev/${LOOP_DEV} mklabel ${label} || local_exit+=1
-  as_root parted --script /dev/${LOOP_DEV} mkpart primary ${FS_TYPE} ${offset}S -- -1 || local_exit+=1
+  as_root parted --script ${LOOP_DEV} mklabel ${label} || local_exit+=1
+  as_root parted --script ${LOOP_DEV} mkpart primary ${FS_TYPE} ${offset}S -- -1 || local_exit+=1
   
   return ${local_exit}
 }
@@ -135,7 +135,9 @@ _partition() {
 _format() {
   # format with filesystem
   local -i local_exit=0
-  as_root mkfs -t ${FS_TYPE} /dev/${LOOP_DEV}p${PART_N} &> /dev/null|| local_exit+=1
+
+  submsg "Foramting with ${FS_TYPE}"
+  as_root mkfs -t ${FS_TYPE} ${LOOP_DEV}p${PART_N} &> /dev/null|| local_exit+=1
   
   return ${local_exit}
 }
