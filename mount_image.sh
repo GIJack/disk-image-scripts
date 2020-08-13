@@ -80,9 +80,10 @@ _list_mounts() {
 
   local -i item=0
   local n=${#loop_names[@]}
+  # reduce loop device names to numbers
   for ((i=0; $i < $n ; i+=1));do
-    j=$((${#item}-1))
-    loop_names[${i}]=${i:${j}:1}
+    j=$(( ${#loop_names[$i]} - 1))
+    loop_names[${i}]=${loop_names[${i}]:${j}:1}
   done
   
   message "Mounted Images:"
