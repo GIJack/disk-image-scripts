@@ -1,0 +1,35 @@
+.TH MOUNT_IMAGE
+.SH NAME
+.B mount_image \-
+Mount and dismount raw disk images(.img)
+.SH SYNOPSIS
+.B mount_image
+.IR <command>
+.IR [file_name.img "|" N]
+.SH DESCRIPTION
+Mount and dismount raw disk images. assumes a single parition in the
+file. n is the number of the loop device, as shown in list. An image
+needs to be a paritioned disk image.
+
+Image is mounted on ~/mnt. You can change this at the top of the
+script
+.SH COMMANDS
+.TP
+.BR mount
+Mount \fIfile_name\fR on ~/mnt
+.TP
+mount_image mount \fI<file_name.img>\fR
+.TP
+.BR umount
+Dismount image in slot \fIN\fR
+.TP
+mount_image umount \fIN\fR
+.TP
+.BR list
+List currently attached images. Will give N to use with \fBumount\fR
+.TP
+mount_image list
+.TP
+
+.SH SEE ALSO
+\fIinit_image\fR(1) \fIshrinkwrap_image\fR(1)

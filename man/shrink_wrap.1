@@ -1,0 +1,19 @@
+.TH SHRINKWRAP_IMAGE
+.SH NAME
+.B shrinkwrap_image \-
+Shrink a .img(Disk Image) to its smallest possible size, for export.
+.SH SYNOPSIS
+.B shrink_wrap \fIfile_name.img\fR
+
+.SH DESCRIPTION
+"Shrink Wrap" a system image for export. Reduce an disk image file to
+its smallest possible size. This is so this .img can be exported, and
+then re-imported into things such as being a cloud VM template
+
+WARNING: This tool makes the assumption:
+1. There is one partition
+2. The partition is ext4
+3. It is a raw disk image
+
+.SH SEE ALSO
+\fImount_image\fR(1) \fIinit_image\fR(1)

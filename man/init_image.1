@@ -1,0 +1,21 @@
+.TH INIT_IMAGE 1
+.SH NAME
+.B init_image \-
+Initialize Disk Image. Generate a new .img(disk image) file, partition it, and format it with an filesystem.
+.SH SYNOPSIS
+.B init_image
+[\fB\-s|\-\-size\fR <size>]
+.IR file_name
+.SH DESCRIPTION
+Create an disk .img file, with a single parition and a file system. Creates a
+file of an arbitrary size, formats it with the ext4 filesystem. Takes one
+parameter, file_name.
+
+Default file size is 20GB.
+.SH OPTIONS
+.TP
+.BR \-s ",	--size"
+Size of image to generate in Megabytes
+
+.SH SEE ALSO
+\fImount_image\fR(1) \fIshrinkwrap_image\fR(1)
