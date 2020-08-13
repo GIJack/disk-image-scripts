@@ -2,7 +2,10 @@
 #
 # Shrink-wrap an image to its smallest possible size. see help
 # Only works with ext4 and only works with single partitioned images
-# For use with mount_image.sh
+# For use with mount_image.sh.
+#
+# Needs GNU Parted
+#
 # error codes 0:Success 1:Operations Fail 2:Abort 4:Invalid User Input
 
 # Defaults #
@@ -64,14 +67,14 @@ as_root(){
 _setup-loop() {
   local -i local_exit=0
   local filename="${1}"
-  submsg "Mounting ${filename} on /dev/${LOOP_DEV} on ${MOUNT_POINT}"
+  submsg "Setting up loop: ${filename} on /dev/${LOOP_DEV}"
   as_root losetup -P ${LOOP_DEV} "${filename}" || local_exit+=1
   return ${local_exit}
 }
 
 _destroy-loop() {
   local -i local_exit=0
-  submsg "Destroying /dev/${LOOP_DEV}"
+  submsg "Destroying loop: /dev/${LOOP_DEV}"
   as_root losetup -d /dev/${LOOP_DEV} &> /dev/null || local_exit+=1
   return ${local_exit}
 }
