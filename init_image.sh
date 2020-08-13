@@ -113,7 +113,7 @@ _create_blank_file() {
   
   submsg "Generating Blank file ${IMG_SIZE}M long"
   dd if="${FILL_SRC}" of="${OUT_FILE}" bs=${blocksize} count=${IMG_SIZE} status=progress || local_exit+=1
-  
+  sync
   return ${local_exit}
 }
 
