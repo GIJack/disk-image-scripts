@@ -11,7 +11,6 @@
 # Defaults #
 LOOP_DEV=$(losetup -f)
 PART_N=1
-#MOUNT_POINT="${HOME}/mnt"
 MOUNT_POINT="$(mktemp -d)"
 ROOT_METHOD="sudo"
 # /Defaults #
@@ -183,6 +182,8 @@ if [ ${?} -ne 0 ];then
     exit_code+=1
 fi
 
+  rmdir ${MOUNT_POINT} # mktemp directory
+  
   # Final report
   filesize_new=$(ls -sh ${filename} | cut -d " " -f 1)
   if [ ${exit_code} -eq 0 ];then
