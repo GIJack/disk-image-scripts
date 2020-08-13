@@ -44,7 +44,7 @@ as_root(){
 
 _mount-img() {
   local -i local_exit=0
-  message "Mounting ${FILENAME} on ${LOOP_DEV} on ${MOUNT_POINT}"
+  message "Mounting ${FILENAME} on /dev/${LOOP_DEV} on ${MOUNT_POINT}"
   as_root losetup -P ${LOOP_DEV} "${FILENAME}"
   local_exit+=${?}
   as_root mount /dev/${LOOP_DEV}p1 ${MOUNT_POINT}
@@ -54,7 +54,7 @@ _mount-img() {
 
 _umount-img() {
   local -i local_exit=0
-  message "UnMounting ${mount_point} on ${loop_dev}"
+  message "UnMounting ${MOUNT_POINT} from /dev/${LOOP_DEV}"
   as_root umount ${MOUNT_POINT}
   local_exit+=${?}
   as_root losetup -d /dev/${LOOP_DEV}
