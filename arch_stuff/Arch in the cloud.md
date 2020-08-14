@@ -40,6 +40,14 @@ syslinux-install-update -i -a -m
 
 sed -i s/sda3/vda1/g /boot/syslinux/syslinux.cfg
 
+nano /etc/mkinitcpio.conf
+
+add this to modules=(): virtio virtio_pci virtio_blk virtio_net virtio_ring
+
+mkinitcpio -p linux
+
+exit
+
 5 - Dismount
 ------------
 umount and image and remove the look
