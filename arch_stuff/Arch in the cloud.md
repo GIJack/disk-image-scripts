@@ -48,6 +48,14 @@ mkinitcpio -p linux
 
 exit
 
+5 - Add Cloud config
+---------------
+Copy(How?)
+overlay files to new iamge
+
+add the files from root_overlay into the new image. most specificly the cloud
+config files
+
 5 - Dismount
 ------------
 umount and image and remove the look
