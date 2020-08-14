@@ -4,6 +4,10 @@ bootable systems inside. Assumed that:
 1. Formatted with an MBR paritioning scheme and boot record.
 2. contains a single parition filling the entire drive, formated with a FS
 
+System requirements:
+1. Arch Linux
+2. GNU Parted
+
 Right now, only MBR partitioning and ext4 filesystem are supported. In the
 future we may support GPT paritioning and xfs filesystems as well.
 
