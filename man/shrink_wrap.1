@@ -15,5 +15,16 @@ WARNING: This tool makes the assumption:
 2. The partition is ext4
 3. It is a raw disk image
 
+.SH OPTIONS
+.TP
+.BR \-d ",	--no-defrag"
+Skip defrag stage
+.TP
+.BR \-z ",	--gzip"
+Compress final image with gzip
+.TP
+.BR \-g ",	--gz-options"
+Options to pass on to gzip, see \fIgzip\fR(1) for more info
+
 .SH SEE ALSO
-\fImount_image\fR(1) \fIinit_image\fR(1)
+\fImount_image\fR(1) \fIinit_image\fR(1) \fIgzip\fR(1)

@@ -13,6 +13,9 @@ LOOP_DEV=$(losetup -f)
 PART_N=1
 MOUNT_POINT="$(mktemp -d)"
 ROOT_METHOD="sudo"
+USE_GZIP="false"
+DEFRAG="true"
+GZIP_OPTIONS=""
 # /Defaults #
 
 help_and_exit(){
@@ -28,7 +31,17 @@ WARNING: This tool makes the assumption:
 2. The partition is ext4
 3. It is a raw disk image
 
-USAGE: shrinkwrap_image.sh <file.img>
+    USAGE:
+    
+    shrinkwrap_image.sh [-options] <file.img>
+
+    OPTIONS:
+    
+    -d,--no-defrag  Skip defrag stage
+    
+    -z,--gzip       Compress final image with gzip
+    
+    -g,--gz-options Options to pass on to gzip
 
 EOF
   exit 4
@@ -138,13 +151,51 @@ EOF
 }
 
 _shrink_image() {
-  local filename=${1}
+  local filename="${1}"
   local -i filesize=${2}
   local -i local_exit=0
 
   submsg "Shrinking Image File"
   qemu-img resize -f raw --shrink ${filename} ${filesize} || local_exit+=1
   return ${local_exit}
+}
+
+_gzip() {
+  local -i local_exit=0
+  local filename="${1}"
+  
+  submsg "Compressing image with gzip"
+  if [ -z ${GZIP_OPTIONS} ];then
+    gzip "${filename}" || local_exit+=1
+   else
+    gzip ${GZIP_OPTIONS} "${filename}" || local_exit+=1
+  fi
+
+  return ${local_exit}
+}
+
+switch_checker() {
+  while [ ! -z "$1" ];do
+   case "$1" in
+    --help|-\?)
+     help_and_exit
+     ;;
+    --no-defrag|-d)
+     DEFRAG="false"
+     ;;
+    --gzip|-z)
+     USE_GZIP="true"
+     ;;
+    --gzip-options|-g)
+     GZIP_OPTIONS="${2}"
+     shift
+     ;;
+    *)
+     PARMS+="${1}"
+     ;;
+   esac
+   shift
+  done
 }
 
 main() {
@@ -164,7 +215,7 @@ main() {
   trap "cleanup_abort_fail Interrupt Recived!" 1 2 3 9 15
   # This ensures all the data is in continous sectors, which allows us
   # to shrink the drive further
-  _defrag
+  [ $DEFRAG != "false" ] && _defrag
   if [ ${?} -ne 0 ];then
     warn "Defrag failed"
     exit_code+=1
@@ -172,20 +223,28 @@ main() {
   
   _resize_part || cleanup_abort_fail "Could not resize partition, you might need to clean up mount points locally"
 
-  _shrink_image ${filename} ${disk_end}
-  if [ ${?} -ne 0 ];then
-    warn "Could not shrink image"
-    exit_code+=1
-  fi
-
   _destroy-loop
 if [ ${?} -ne 0 ];then
     warn "Could not stop loop device ${LOOP_DEV}, you should do this manually"
     exit_code+=1
 fi
-
   rmdir ${MOUNT_POINT} # mktemp directory
+
+  _shrink_image ${filename} ${disk_end}
+  if [ ${?} -ne 0 ];then
+    warn "Could not shrink image"
+    exit_code+=1
+  fi
   
+  if [ ${USE_GZIP} == "true" ];then
+    _gzip "${filename}"
+    if [ $? -ne 0 ];then
+      warn "gzip failed!"
+      exit_code+=1
+    fi
+    
+    filename+=".gz"
+  fi
   # Final report
   filesize_new=$(ls -sh ${filename} | cut -d " " -f 1)
   if [ ${exit_code} -eq 0 ];then
@@ -197,5 +256,6 @@ fi
   fi
   
 }
-
-main "${@}"
+PARMS=""
+switch_checker "${@}"
+main "${PARMS}"
