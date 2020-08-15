@@ -11,7 +11,7 @@ pkg_arch_vanilla="base linux linux-firmware syslinux nano"
 # To be run in a chroot for development
 pkg_arch_vanilla_dev="base base-devel nano vi"
 
-pkg_arch_cloud_base="base linux syslinux nano vi openssh cloud-init cloud-utils"
+pkg_arch_cloud_base="base linux syslinux nano vi openssh cloud-init clout-init-extra cloud-utils"
 ## /Package Lists
 
 ## Modules

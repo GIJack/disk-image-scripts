@@ -29,7 +29,10 @@ sudo pacstrap ~/mnt base linux nano vi cloud-init cloud-utils syslinux openssh
 4 - Base configure
 ------------------
 base system configuration, so the system is bootable. Uses arch-chroot from
-arch-install-scripts
+arch-install-scripts.
+
+Its also advisable to try this package that I also maintain from AUR:
+https://aur.archlinux.org/packages/cloud-init-extra/
 
 sudo arch-chroot ~/mnt
 
@@ -48,13 +51,6 @@ mkinitcpio -p linux
 
 exit
 
-5 - Add Cloud config
----------------
-Copy(How?)
-overlay files to new iamge
-
-add the files from root_overlay into the new image. most specificly the cloud
-config files
 
 5 - Dismount
 ------------
