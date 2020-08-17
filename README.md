@@ -22,7 +22,7 @@ Scripts:
 
 mount_image.sh - mount or unmount a previously made image
 
-image_shrinkwrap.sh - reduce an .img to its smallest possible size. Especially
+shrinkwrap_image.sh - reduce an .img to its smallest possible size. Especially
 for export.
 
 init_image.sh - create a blank image file, formated with a single parition and a
