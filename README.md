@@ -20,10 +20,11 @@ machine systems.
 
 Scripts:
 
+init_image.sh - create a blank image file, formated with a single parition and a
+filesystem
+
 mount_image.sh - mount or unmount a previously made image
 
 shrinkwrap_image.sh - reduce an .img to its smallest possible size. Especially
 for export.
 
-init_image.sh - create a blank image file, formated with a single parition and a
-filesystem
