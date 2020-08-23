@@ -5,6 +5,7 @@ bootable systems inside. Assumed that:
 2. contains a single parition filling the entire drive, formated with a FS
 
 System requirements:
+--------------------
 1. Arch Linux
 2. GNU Parted
 3. qemu (uses qemu-resize)
@@ -20,7 +21,7 @@ This is particularly useful if making an image for the cloud or other virtual
 machine systems.
 
 Scripts:
-
+--------
 init_image.sh - create a blank image file, formated with a single parition and a
 filesystem
 
@@ -29,3 +30,12 @@ mount_image.sh - mount or unmount a previously made image
 shrinkwrap_image.sh - reduce an .img to its smallest possible size. Especially
 for export.
 
+Instalation
+-----------
+There is a Makefile for GNU make with two options
+
+make install
+
+make remove
+
+This should be self-explanitory
