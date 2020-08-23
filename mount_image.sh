@@ -3,8 +3,6 @@
 # Mount a disk img(.img) See help below
 #
 # error codes 0:Success 1:Operations Fail 2:Abort 4:Invalid User Input
-COMMAND="${1}"
-FILENAME="${2}"
 LOOP_DEV=$(losetup -f)
 PART_N=1
 MOUNT_POINT="${HOME}/mnt"
@@ -18,18 +16,22 @@ Mount and dismount raw disk images. assumes a single parition in the
 file. n is the number of the loop device, as shown in list. An image
 needs to be a paritioned disk image.
 
-Image is mounted on $HOME/mnt. You can change this at the top of the
-script
+Default mountpoint is $HOME/mnt. see -m option below
 
-USAGE: mount_image.sh <command> [file.img|n]
+USAGE: mount_image.sh <-switches> [command] [file.img|n]
 
-Commands: mount umount list
+COMMANDS: mount umount list
 
-    mount: mount_image.sh mount <filename.img>
+	mount: mount_image.sh mount <filename.img>
     
-    umount: mount_image.sh umount <n>
+	umount: mount_image.sh umount <n>
     
-    list: list mounted images. gives Numbers <n> to use with umount
+	list: list mounted images. gives Numbers <n> to use with umount
+    
+SWITCHES:
+
+	-m, --mount-point	Specificy directory to use as mountpoint,
+				default is $HOME/mnt
 
 EOF
   exit 4
@@ -60,9 +62,11 @@ as_root() {
 
 _mount-img() {
   local -i local_exit=0
-  message "Mounting ${FILENAME} on ${LOOP_DEV} on ${MOUNT_POINT}"
-
-  as_root losetup -P ${LOOP_DEV} "${FILENAME}" || local_exit+=1
+  local filename="${1}"
+  message "Mounting ${filename} on ${LOOP_DEV} on ${MOUNT_POINT}"
+  [ -z "${MOUNT_POINT}" ] && exit_with_error 4 "No mountpoint specified with -m see --help"
+  [ -d "${MOUNT_POINT}" ] || exit_with_error 4 "${MOUNT_POINT} is not a directory, exiting!"
+  as_root losetup -P ${LOOP_DEV} "${filename}" || local_exit+=1
   as_root mount ${LOOP_DEV}p${PART_N} ${MOUNT_POINT} || local_exit+=1
 
   return ${local_exit}
@@ -70,11 +74,12 @@ _mount-img() {
 
 _umount-img() {
   local -i local_exit=0
-  LOOP_DEV=/dev/loop${1}
+  index=${1}
+  LOOP_DEV=/dev/loop${index}
 
   message "UnMounting ${MOUNT_POINT} from ${LOOP_DEV}"
 
-  as_root umount ${MOUNT_POINT} || local_exit+=1
+  as_root umount ${LOOP_DEV}p${PART_N} || local_exit+=1
   as_root losetup -d ${LOOP_DEV} || local_exit+=1
 
   return ${local_exit}
@@ -101,15 +106,37 @@ _list_mounts() {
   done
 }
 
+switch_checker() {
+  PARMS=""
+  while [ ! -z "${1}" ];do
+   case "$1" in
+    -\?|--help)
+     help_and_exit
+     ;;
+    -m|--mount-point)
+     MOUNT_POINT="${2}"
+     shift
+     ;;
+    *)
+     PARMS+="${1} "
+     ;;
+   esac
+   shift
+  done
+}
+
 main() {
-  case ${COMMAND} in
+  local command="${1}"
+  case ${command} in
     mount)
-      [ -z ${FILENAME} ] && help_and_exit
-      _mount-img || exit_with_error 1 "Could not mount ${FILENAME}"
+      local filename="${2}"
+      [ -z ${filename} ] && help_and_exit
+      _mount-img "${filename}" || exit_with_error 1 "Could not mount ${filename}"
       ;;
     umount)
-      [ -z ${FILENAME} ] && help_and_exit
-      _umount-img ${FILENAME} || exit_with_error 1 "Could Not unmount ${MOUNT_POINT}"
+      local -i loop_index=${2}
+      [ -z ${loop_index} ] && help_and_exit
+      _umount-img ${loop_index} || exit_with_error 1 "Could Not unmount ${MOUNT_POINT}"
       ;;
     list)
       _list_mounts || exit_with_error 1 "Couldn't list mounts???"
@@ -119,5 +146,5 @@ main() {
       ;;
   esac
 }
-
-main "${@}"
+switch_checker "${@}"
+main ${PARMS}
