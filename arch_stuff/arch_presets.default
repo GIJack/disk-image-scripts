@@ -6,7 +6,7 @@
 # pacstrap mountpoint $pkg_list
 
 # Base archlinux system to be used on metal
-pkg_arch_vanilla="base linux linux-firmware syslinux nano"
+pkg_arch_vanilla="base linux linux-firmware syslinux nano vi"
 
 # To be run in a chroot for development
 pkg_arch_vanilla_dev="base base-devel nano vi"
