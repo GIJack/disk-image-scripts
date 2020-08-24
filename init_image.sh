@@ -13,7 +13,7 @@ FILL_SRC=/dev/zero
 
 LOOP_DEV=$(losetup -f)
 PART_N=1
-MOUNT_POINT="${HOME}/mnt"
+MOUNT_POINT="$(mktemp -d)"
 ROOT_METHOD="sudo"
 # /Defaults #
 
@@ -27,11 +27,11 @@ parameter, filename.
 
 Default file size is 20GB.
 
-	USAGE:
+USAGE:
 	
 	init_image [-s <size>] <filename.img>
 	
-	OPTIONS:
+OPTIONS:
 	
 	-s,--size	Size of image, in Megabytes, defaults to 20GB
 
@@ -89,8 +89,10 @@ switch_checker() {
 }
 
 abort_cleanup() {
+  # If this fails or is aborted, cleanup before we exit
   rm "${OUTFILE}"
   as_root losetup -d ${LOOP_DEV} &> /dev/null
+  rmdir "${MOUNT_POINT}"
   exit_with_error 2 "INTERRUPT: ABORT!"
 }
 
@@ -163,6 +165,21 @@ main() {
   if [ ${?} -ne 0 ];then
     "Couldn't remove loop device. Clean up mantually" 
     errors+=1
+  fi
+  
+  # Clean up last random mount point
+  rmdir "${MOUNT_POINT}"
+  if [ ${?} -ne 0 ];then
+    warn "couldn't delete ${MOUNT_POINT}, clean up manually"
+    errors+=1
+  fi
+  
+  if [ $errors -gt 0 ];then
+    message "Done, but with ${errors} errors"
+    exit 1
+   else
+    message "Done"
+    exit 0
   fi
 }
 
