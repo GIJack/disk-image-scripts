@@ -38,20 +38,20 @@ OPTIONS:
 EOF
   exit 4
 }
-message(){
+message() {
   echo "init_image.sh: ${@}"
 }
 
-submsg(){
-  echo "[+]	${@}"
+submsg() {
+  echo "==>	${@}"
 }
 
-exit_with_error(){
+exit_with_error() {
   echo 1>&2 "init_image.sh: ERROR: ${2}"
   exit ${1}
 }
 
-warn(){
+warn() {
   echo 1>&2 "init_image.sh: WARN: ${@}"
 }
 

@@ -46,19 +46,19 @@ WARNING: This tool makes the assumption:
 EOF
   exit 4
 }
-message(){
+message() {
   echo "shrinkwrap_image.sh: ${@}"
 }
 
-submsg(){
-  echo "[+]	${@}"
+submsg() {
+  echo "==>	${@}"
 }
 
-warn(){
+warn() {
   echo 1>&2 "shrinkwrap_image.sh: WARN: ${@}"
 }
 
-exit_with_error(){
+exit_with_error() {
   echo 1>&2 "shrinkwrap_image.sh: ERROR: ${2}"
   exit ${1}
 }
