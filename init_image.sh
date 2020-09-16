@@ -157,7 +157,7 @@ main() {
   
   _setup-loop || exit_with_error 1 "Could Not Set Up Loop Device, Exiting"
   
-  _partition || exit_with_error 1 "Could Not Generate Paritions in ${OUTFILE}, Exiting"
+  _partition || exit_with_error 1 "Could Not Generate Paritions in ${OUT_FILE}, Exiting"
   
   _format || exit_with_error 1 "Formatting Failed, Exiting"
   
