@@ -4,7 +4,7 @@ Arch In the Cloud
 This is how you create a VM template for cloud providers using:
 * disk-image-scripts
 * arch-install-scripts
-* cloud-init + cloud-utils
+* cloud-init + cloud-utils + cloud-init-extra
 
 1 - Create a Disk Image
 -----------------------
@@ -25,32 +25,17 @@ Install Arch to the image with pacstrap from arch-install-scripts:
 
 sudo pacstrap ~/mnt base linux nano vi cloud-init cloud-utils syslinux openssh
 
+Install cloud-init-extra package:
+
+https://github.com/GIJack/cloud-init-extra
+https://aur.archlinux.org/packages/cloud-init-extra/
 
 4 - Base configure
 ------------------
-base system configuration, so the system is bootable. Uses arch-chroot from
-arch-install-scripts.
 
-Its also advisable to try this package that I also maintain from AUR:
-https://aur.archlinux.org/packages/cloud-init-extra/
+run /usr/share/cloud-init-extra/init.arch.sh in the chroot.
 
-sudo arch-chroot ~/mnt
-
-systemctl enable sshd systemd-networkd cloud-init-local cloud-init cloud-config \
-cloud-final
-
-syslinux-install-update -i -a -m
-
-sed -i s/sda3/vda1/g /boot/syslinux/syslinux.cfg
-
-nano /etc/mkinitcpio.conf
-
-add this to MODULES=(): virtio virtio_pci virtio_blk virtio_net virtio_ring
-
-mkinitcpio -p linux
-
-exit
-
+This entire step has been replaced with this script.
 
 5 - Dismount
 ------------
