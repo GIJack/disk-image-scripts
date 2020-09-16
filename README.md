@@ -7,7 +7,7 @@ bootable systems inside. Assumed that:
 System requirements:
 --------------------
 1. Arch Linux
-2. qemu (uses qemu-resize)
+2. qemu (uses qemu-img resize)
 
 Right now, only MBR partitioning and ext4 filesystem are supported. In the
 future we may support GPT paritioning and xfs filesystems as well.
