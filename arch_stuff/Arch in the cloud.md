@@ -48,7 +48,7 @@ umount and image and remove the look
 ```
 mount_image.sh list # Get the loop device number -> N
 
-mount_image.sh umount N
+mount_image.sh umount <N>
 ```
 
 6 - Shrinkwrap
