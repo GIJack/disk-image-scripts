@@ -124,13 +124,18 @@ _create_blank_file() {
 _partition() {
   # Create partition
   local -i local_exit=0
-  local label="msdos"
-  local -i offset=2048 #first 2048 sectors
+  #local label="msdos"
+  #local -i offset=2048 #first 2048 sectors
   
   submsg "Partitioning image"
-  as_root parted --script ${LOOP_DEV} mklabel ${label} || local_exit+=1
-  as_root parted --script ${LOOP_DEV} mkpart primary ${FS_TYPE} ${offset}S -- -1 || local_exit+=1
-  
+  # parted
+  #as_root parted --script ${LOOP_DEV} mklabel ${label} || local_exit+=1
+  #as_root parted --script ${LOOP_DEV} mkpart primary ${FS_TYPE} ${offset}S -- -1 || local_exit+=1
+  # sfdisk
+  as_root sfdisk ${LOOP_DEV} > /dev/null << EOF
+;
+EOF
+  [ $? -ne 0 ] && local_exit+=1
   return ${local_exit}
 }
 
