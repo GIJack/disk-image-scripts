@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Initialize an .img file with a single partition and formated.
+# Initialize an .img file with a single partition and formated with a
+# filesystem.
 
 # Defaults #
 # Filesystem to use. At this time, only ext4 is supported
