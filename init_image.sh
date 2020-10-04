@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 # Initialize an .img file with a single partition and formated.
 
-# Needs GNU Parted
-
 # Defaults #
 # Filesystem to use. At this time, only ext4 is supported
 FS_TYPE="ext4"
