@@ -17,7 +17,7 @@ PROJECT_DESCRIPTION=""	# Optional
 AUTHOR_NAME="Unknown Author"
 AUTHOR_ORG="" #Organization
 AUTHOR_EMAIL=""
-AUTHOR_PGP_SIG="" # Must match AUTHOR_EMAIL
+AUTHOR_GPG_SIG="" # Must match AUTHOR_EMAIL
 # space seperated list of additional contact info in the format of
 # protocol:address. Example. for IRC use IRC:<NETWORK>:<NICK|IRC address>
 #AUTHOR_CONTACT="protocol1:address protocol2:instance:address"
