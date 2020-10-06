@@ -8,6 +8,8 @@ install:
 	install -Dm 644 man/shrink_wrap.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/shrink_wrap.1"
 	install -Dm 644 man/mount_image.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/mount_image.1"
 	install -Dm 644 man/mount_image.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/gen_template_image.1"
+	install -dm 755 "$(DESTDIR)/usr/share/disk-image-scripts/"
+	cp -ra default_template "$(DESTDIR)/usr/share/disk-image-scripts/default_template"
 	
 remove:
 	rm "$(DESTDIR)/$(PREFIX)/bin/mount_image.sh"
@@ -18,3 +20,4 @@ remove:
 	rm "$(DESTDIR)/$(PREFIX)/share/man/man1/shrink_wrap.1"
 	rm "$(DESTDIR)/$(PREFIX)/share/man/man1/mount_image.1"
 	rm "$(DESTDIR)/$(PREFIX)/share/man/man1/gen_template_image.1"
+	rm -rf "$(DESTDIR)/usr/share/disk-image-scripts/"

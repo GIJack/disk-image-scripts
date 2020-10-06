@@ -13,6 +13,8 @@
 PART_N=1
 MOUNT_POINT="$(mktemp -d)"
 ROOT_METHOD="sudo"
+BASE_IMAGE="base-arch.img"
+
 # /Defaults #
 
 help_and_exit() {
@@ -38,10 +40,7 @@ profile. Needs cloud-init-extra package from AUR available in a custom repo.
 				argument, a directory path. If none is specified
 				then \$PWD is used. This image needs to be in
 				profile path
-				
-	update-base-image	Runs pacman -Syu in chroot on base-image.
-	
-	
+
 	
 	compile-template	Generates usable Cloud VM Template based on
 				metadata, overlay. Filename will be based on
@@ -94,4 +93,86 @@ as_root() {
     ${@}
     ;;
   esac
+}
+parse_environment(){
+  # parse a key=pair shell enviroment file. NOTE all keys will be made UPPERCASE
+  # variables. in parent script.
+
+  local infile="${@}"
+  local safe_config=$(mktemp)
+  local key=""
+  local value=""
+
+  
+  [ -f "${infile}" ] || return 2 # infile is not a file
+  # Now we have an array of file lines
+  readarray file_lines < "${infile}" || return 1 # error proccessing
+
+  for line in "${file_lines[@]}";do
+    # Remove comments
+    [[ -z "{$line}" || "${line}" == "#" ]] && continue
+    line=$(cut -d "#" -f 1 <<< ${line} )
+
+    # Split key and value from lines
+    key=$(cut -d "=" -f 1 <<< ${line} )
+    value=$(cut -d "=" -f 2 <<< ${line} )
+
+    # Parse key. Make the Key uppercase, remove spaces and all non-alphanumeric
+    # characters
+    key="${key^^}"
+    key="${key// /}"
+    key="$(tr -cd "[:alnum:]" <<< $key)"
+
+    # Parse value. Remove anything that can escape a variable and run code.
+    value="$(tr -d ";|&()" <<< $value )"
+
+    # Zero check. If after cleaning either the key or value is null, then
+    # write nothing
+    [ -z ${key} ] && continue
+    [ -z $value ] && continue
+
+    # write sanitized values to temp file
+    echo "${key}=${value}" >> ${safe_config}
+  done
+
+  #Now, we can import the cleaned config and then delete it.
+  source ${safe_config}
+  rm -f ${safe_config}
+}
+
+is_template(){
+  # Check if directory is template. if no directory is specified use $PWD
+  # returns 0 if True, 1 if False
+  local target="${PWD}"
+  [ ! -z $1 ] && target="${1}"
+  # check to make sure nessecary files exist
+  [ ! -d "${target}" ] && return 1
+  [ ! -f "${target}/template.rc" ] && return 1
+  [ ! -d "${target}/rootoverlay" ] && return 1
+
+  # check config for bare min config
+  parse_environment "${target}"
+  # Metadata
+  [[ -z ${PROJECTNAME} || -z ${PROJECTVER} || -z ${PROJECTARCH} ]] && return 1
+  # System
+  [[ -z ${KERNEL} || -z ${BOOTLOADER} || -z ${SYSTEMSERVICES} ]] && return 1
+  [[ -z ${EXTRAPACKAGES} || -z ${EXTRAINTMODULES} ]] && return 1
+  
+  # If nothing fails, check passes
+  return 0
+}
+
+_init_template() {
+  # Create new template.
+  local target="${PWD}"
+  [ ! -z $1 ] && target="${1}"
+
+  if is_template "${target}";then
+    exit_with_error 2 "${target} is already a template, exiting..."
+   elif [[ -f "${target}" || -c "${target}" || -b "${target}" || -p "${target}" ]];then
+     exit_with_error 2 "${target} exists as non-directory file or object, fail!"
+   elif [ -d "${target}" ];then
+    warn "${target} exists as a directory, but not a profile, initializing anyway"
+  fi
+  cp -ra "/usr/share/disk-image-scripts/default_template/*" "${target}" || exit_with_error 1 "Couldn't copy files, template initialization failed!"
 }

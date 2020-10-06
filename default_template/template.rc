@@ -1,0 +1,49 @@
+#@TEMPLATEPROFILE
+
+# Metadata and defaults file for Disk-Image-Script's gen_template.image.sh.
+# This will overwrite anything in init.arch.local.
+FILEFORMAT=0
+
+### Project Metadata ###
+
+# Name of project, version, and the OS Archecture. Arch follows same standards
+# As upstream Arch Linux. 0 and null versions will be ignored.
+PROJECT_NAME="Unknown Arch Project"
+PROJECT_VER=0
+PROJECT_ARCH="any"
+PROJECT_DESCRIPTION=""	# Optional
+
+# Name and Contact of maintainers. This section is optional
+AUTHOR_NAME="Unknown Author"
+AUTHOR_ORG="" #Organization
+AUTHOR_EMAIL=""
+AUTHOR_PGP_SIG="" # Must match AUTHOR_EMAIL
+# space seperated list of additional contact info in the format of
+# protocol:address. Example. for IRC use IRC:<NETWORK>:<NICK|IRC address>
+#AUTHOR_CONTACT="protocol1:address protocol2:instance:address"
+
+### /Project Metadata ###
+
+### System Info ###
+# This will overwrite init.arch.local
+
+# Added for future compatibility. Does nothing, and EXT4 will always be used
+FILESYSTEM="ext4"
+
+# Name of kernel package. Default is "linux"
+KERNEL="linux"
+
+# As of now, only syslinux is supported. Added for future compatibility
+BOOTLOADER="syslinux"
+
+# List of additional services to enable.
+SYSTEMSERVICES=""
+
+# List of additional packages to install, beyond base. Text editors are not
+# provided by default. It would be wise to pick one
+EXTRAPACKAGES="nano"
+#EXTRA_PACKAGES="nano vi emacs-nox"
+
+# List of extra kernel modules to be included in the initcpio image
+EXTRAINTMODULES=""
+### /System Info ###
