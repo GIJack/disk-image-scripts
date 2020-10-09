@@ -27,6 +27,10 @@ AUTHOR_GPG_SIG="" # Must match AUTHOR_EMAIL
 ### System Info ###
 # This will overwrite init.arch.local
 
+# Size of initial image for base install. NOTE the final image gets reduced with
+# shrinkwrap to the smallest possible size
+#IMGSIZE=20480 # 20GB
+
 # Added for future compatibility. Does nothing, and EXT4 will always be used
 FILESYSTEM="ext4"
 

@@ -9,11 +9,13 @@
 
 # Defaults #
 
-
 PART_N=1
 MOUNT_POINT="$(mktemp -d)"
 ROOT_METHOD="sudo"
-BASE_IMAGE="base-arch.img"
+BASE_IMAGE="base-install.img"
+TEMPLATE_INDEX="template.rc"
+IMGSIZE=20480 # 20GB
+BASE_PACKAGES="base cloud-init cloud-utils openssh mkinitcpio"
 
 # /Defaults #
 
@@ -35,11 +37,18 @@ profile. Needs cloud-init-extra package from AUR available in a custom repo.
 				given, \$PWD is used. Otherwise argument is
 				directory path.
 				
-	init-base-image		Generate a base install of Arch in an image in
-				a file named 'base-arch.img'. Takes an optional
+	init-image		Generate an install of Arch in an image in a
+				file named 'base-install.img'. Takes an optional
 				argument, a directory path. If none is specified
 				then \$PWD is used. This image needs to be in
 				profile path
+				
+	update-image		Update the packages of of Arch Image. Runs
+				pacman -Syu.
+				
+	image-shell		Open a shell on the Arch Image. NOTE:
+				rootoverlay is not applied. commands that
+				require these files won't work.
 
 	
 	compile-template	Generates usable Cloud VM Template based on
@@ -147,11 +156,11 @@ is_template(){
   [ ! -z $1 ] && target="${1}"
   # check to make sure nessecary files exist
   [ ! -d "${target}" ] && return 1
-  [ ! -f "${target}/template.rc" ] && return 1
+  [ ! -f "${target}/${TEMPLATE_INDEX}" ] && return 1
   [ ! -d "${target}/rootoverlay" ] && return 1
 
   # check config for bare min config
-  parse_environment "${target}"
+  parse_environment "${target}/template.rc"
   # Metadata
   [[ -z ${PROJECTNAME} || -z ${PROJECTVER} || -z ${PROJECTARCH} ]] && return 1
   # System
@@ -162,6 +171,7 @@ is_template(){
   return 0
 }
 
+#--- Commands ---#
 _init_template() {
   # Create new template.
   local target="${PWD}"
@@ -176,3 +186,58 @@ _init_template() {
   fi
   cp -ra "/usr/share/disk-image-scripts/default_template/*" "${target}" || exit_with_error 1 "Couldn't copy files, template initialization failed!"
 }
+
+_init_image() {
+  local target="${PWD}"
+  local mount_point="$(mktemp -d)"
+  local mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
+  local mount_target=${mount_dev: -1}
+  [ ! -z $1 ] && target="${1}"
+
+  is_template "${target}" || exit_with_error 2 "Not a valid template. Cannot continue."
+  parse_environment "${target}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
+  init_image.sh -s ${IMGSIZE} "${target}/${BASE_IMAGE}" || exit_with_error 1 "Image initalization threw a code, quitting."
+  mount_image.sh mount -m "${mount_point}" "${target}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
+  pacstrap "${mount_point}" ${BASE_PACKAGES} ${EXTRAPACKAGES} || exit_with_error 1 "Base install failed. Please check output."
+  mount_image umount ${mount_target} || warn "Unmount failed, please check"
+  rmdir ${mount_point}
+}
+
+_update_image(){
+  local target="${PWD}"
+  local mount_point="$(mktemp -d)"
+  local mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
+  local mount_target=${mount_dev: -1}
+  [ ! -z $1 ] && target="${1}"
+
+  is_template "${target}" || exit_with_error 2 "Not a valid template. Cannot continue."
+  [ ! -f "${target}/${BASE_IMAGE}" ] || exit_with_error 1 "Base install cannot be found. perhaps you forgot to init-image?"
+
+  mount_image.sh mount -m "${mount_point}" "${target}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
+  as_root arch-chroot "${mount_point}" "pacman -Syu"
+  mount_image umount ${mount_target} || warn "Unmount failed, please check"
+  rmdir ${mount_point}
+}
+
+_image_shell(){
+  local target="${PWD}"
+  local mount_point="$(mktemp -d)"
+  local mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
+  local mount_target=${mount_dev: -1}
+  [ ! -z $1 ] && target="${1}"
+
+  is_template "${target}" || exit_with_error 2 "Not a valid template. Cannot continue."
+  [ ! -f "${target}/${BASE_IMAGE}" ] || exit_with_error 1 "Base install cannot be found. perhaps you forgot to init-image?"
+
+  mount_image.sh mount -m "${mount_point}" "${target}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
+  as_root arch-chroot "${mount_point}"
+  mount_image umount ${mount_target} || warn "Unmount failed, please check"
+  rmdir ${mount_point}
+}
+#/--- Commands ---/#
+
+main() {
+
+}
+
+main "${@}"

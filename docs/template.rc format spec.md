@@ -86,6 +86,11 @@ SYSTEM
 The following keys are used to describe and control system behavior and
 configuration:
 
+IMGSIZE			Size in Megabytes of initial system install. This needs
+			to be big enough to accomidate base system install.
+			However, the final image will be shrunk to smallest size
+			before export.
+
 FILESYSTEM		For future compatibility. Only EXT4 is supported and
 			only EXT4 will be used
 
