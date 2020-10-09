@@ -60,7 +60,8 @@ profile. Needs cloud-init-extra package from AUR available in a custom repo.
 	applied over a base install of Arch Linux.
     
 	==> FILES:
-	    template.rc  - file with metadata
+	    template.rc  - file with metadata. see man 5 template_rc for more
+	    information
 	
 	    rootoverlay/ - directory with a root overlay. This gets applied on
 	    top of base install. Will overwrite any file that exists.
