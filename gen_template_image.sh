@@ -153,8 +153,8 @@ parse_environment(){
 is_template(){
   # Check if directory is template. if no directory is specified use $PWD
   # returns 0 if True, 1 if False
-  local target="${PWD}"
-  [ ! -z $1 ] && target="${1}"
+  local target="${1}"
+  [ -z $"{target}" ] && return 1
   # check to make sure nessecary files exist
   [ ! -d "${target}" ] && return 1
   [ ! -f "${target}/${TEMPLATE_INDEX}" ] && return 1
@@ -205,32 +205,28 @@ _init_image() {
 }
 
 _update_image(){
-  local target="${PWD}"
   local mount_point="$(mktemp -d)"
   local mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
   local mount_target=${mount_dev: -1}
-  [ ! -z $1 ] && target="${1}"
 
-  is_template "${target}" || exit_with_error 2 "Not a valid template. Cannot continue."
-  [ ! -f "${target}/${BASE_IMAGE}" ] || exit_with_error 1 "Base install cannot be found. perhaps you forgot to init-image?"
+  is_template "${TARGET}" || exit_with_error 2 "Not a valid template. Cannot continue."
+  [ ! -f "${TARGET}/${BASE_IMAGE}" ] || exit_with_error 1 "Base install cannot be found. perhaps you forgot to init-image?"
 
-  mount_image.sh mount -m "${mount_point}" "${target}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
+  mount_image.sh mount -m "${mount_point}" "${TARGET}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
   as_root arch-chroot "${mount_point}" "pacman -Syu"
   mount_image umount ${mount_target} || warn "Unmount failed, please check"
   rmdir ${mount_point}
 }
 
 _image_shell(){
-  local target="${PWD}"
   local mount_point="$(mktemp -d)"
   local mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
   local mount_target=${mount_dev: -1}
-  [ ! -z $1 ] && target="${1}"
 
-  is_template "${target}" || exit_with_error 2 "Not a valid template. Cannot continue."
-  [ ! -f "${target}/${BASE_IMAGE}" ] || exit_with_error 1 "Base install cannot be found. perhaps you forgot to init-image?"
+  is_template "${TARGET}" || exit_with_error 2 "Not a valid template. Cannot continue."
+  [ ! -f "${TARGET}/${BASE_IMAGE}" ] || exit_with_error 1 "Base install cannot be found. perhaps you forgot to init-image?"
 
-  mount_image.sh mount -m "${mount_point}" "${target}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
+  mount_image.sh mount -m "${mount_point}" "${TARGET}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
   as_root arch-chroot "${mount_point}"
   mount_image umount ${mount_target} || warn "Unmount failed, please check"
   rmdir ${mount_point}
@@ -238,7 +234,8 @@ _image_shell(){
 #/--- Commands ---/#
 
 main() {
-
+  TARGET=${PWD}
+  [ ! -z "${1}" ] && TARGET=${$1}
 }
 
 main "${@}"
