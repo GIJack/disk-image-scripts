@@ -16,6 +16,7 @@ BASE_IMAGE="base-install.img"
 TEMPLATE_INDEX="template.rc"
 IMGSIZE=20480 # 20GB
 BASE_PACKAGES="base cloud-init cloud-utils openssh mkinitcpio"
+SCRIPT_BASE_DIR="/usr/share/disk-image-scripts/"
 
 # /Defaults #
 
@@ -109,13 +110,11 @@ as_root() {
 parse_environment(){
   # parse a key=pair shell enviroment file. NOTE all keys will be made UPPERCASE
   # variables. in parent script.
-
   local infile="${@}"
   local safe_config=$(mktemp)
   local key=""
   local value=""
 
-  
   [ -f "${infile}" ] || return 2 # infile is not a file
   # Now we have an array of file lines
   readarray file_lines < "${infile}" || return 1 # error proccessing
@@ -177,91 +176,96 @@ is_template(){
 #--- Commands ---#
 _init_template() {
   # Create new template.
-  local target="${PWD}"
-  [ ! -z $1 ] && target="${1}"
 
-  if is_template "${target}";then
-    exit_with_error 2 "${target} is already a template, exiting..."
+  if is_template "${TARGET}";then
+    exit_with_error 2 "${TARGET} is already a template, exiting..."
    elif [[ -f "${target}" || -c "${target}" || -b "${target}" || -p "${target}" ]];then
-     exit_with_error 2 "${target} exists as non-directory file or object, fail!"
-   elif [ -d "${target}" ];then
-    warn "${target} exists as a directory, but not a profile, initializing anyway"
+     exit_with_error 2 "${TARGET} exists as non-directory file or object, fail!"
+   elif [ -d "${TARGET}" ];then
+    warn "${TARGET} exists as a directory, but not a profile, initializing anyway"
   fi
-  cp -ra "/usr/share/disk-image-scripts/default_template/*" "${target}" || exit_with_error 1 "Couldn't copy files, template initialization failed!"
+  cp -ra "${SCRIPT_BASE_DIR}/default_template/*" "${TARGET}" || exit_with_error 1 "Couldn't copy files, template initialization failed!"
 }
 
 _init_image() {
   local target="${PWD}"
   local mount_point="$(mktemp -d)"
-  local mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
-  local mount_target=${mount_dev: -1}
-  [ ! -z $1 ] && target="${1}"
+  local mount_dev=""
+  local mount_target=""
 
-  is_template "${target}" || exit_with_error 2 "Not a valid template. Cannot continue."
   parse_environment "${target}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
   init_image.sh -s ${IMGSIZE} "${target}/${BASE_IMAGE}" || exit_with_error 1 "Image initalization threw a code, quitting."
+
   mount_image.sh mount -m "${mount_point}" "${target}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
+  mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
+  mount_target=${mount_dev: -1}
+
   pacstrap "${mount_point}"${KERNEL} ${BOOTLOADER} ${BASE_PACKAGES} ${EXTRAPACKAGES} || exit_with_error 1 "Base install failed. Please check output."
   mount_image umount ${mount_target} || warn "Unmount failed, please check"
   rmdir ${mount_point}
 }
 
 _update_image(){
-  local mount_point="$(mktemp -d)"
-  local mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
-  local mount_target=${mount_dev: -1}
-
-  is_template "${TARGET}" || exit_with_error 2 "Not a valid template. Cannot continue."
-  [ ! -f "${TARGET}/${BASE_IMAGE}" ] || exit_with_error 1 "Base install cannot be found. perhaps you forgot to init-image?"
-
-  mount_image.sh mount -m "${mount_point}" "${TARGET}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
-  as_root arch-chroot "${mount_point}" "pacman -Syu"
-  mount_image umount ${mount_target} || warn "Unmount failed, please check"
-  rmdir ${mount_point}
+  # Patch the base install, using pacman.
+  _image_shell "pacman -Syu"
 }
 
 _image_shell(){
+  # open a shell in a chroot in the installed image. Optionally run
+  # command in said shell.
   local mount_point="$(mktemp -d)"
-  local mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
-  local mount_target=${mount_dev: -1}
+  local mount_dev=""
+  local mount_target=""
+  [ ! -z "${1}" ] && local command="${1};exit"
 
-  is_template "${TARGET}" || exit_with_error 2 "Not a valid template. Cannot continue."
   [ ! -f "${TARGET}/${BASE_IMAGE}" ] || exit_with_error 1 "Base install cannot be found. perhaps you forgot to init-image?"
 
+  # Set up mount and get unmount data
   mount_image.sh mount -m "${mount_point}" "${TARGET}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
-  as_root arch-chroot "${mount_point}"
+  mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
+  mount_target=${mount_dev: -1}
+
+  # Run command
+  if [ -z "${command}" ];then
+    as_root arch-chroot "${mount_point}"
+   else
+    as_root arch-chroot "${mount_point}" "${command}"
+  fi
+  
+  # Cleanup
   mount_image umount ${mount_target} || warn "Unmount failed, please check"
   rmdir ${mount_point}
 }
 #/--- Commands ---/#
 
 main() {
+
+  # Step one, resolve command and target
   TARGET="${PWD}"
   SCRIPT_CMD="${1}"
-  # Set this initially.
+  [ ! -z "${2}" ] TARGET="${2}"
 
   # First parameter is subcommand
   case ${SCRIPT_CMD} in
-   help|\?)
-    help_and_exit
-    ;;
-   init-template)
+   init-template)    
     _init_template
     ;;
    init-image)
-    _init_template
+    is_template ${TARGET} || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
+    _init_image
     ;;
    image-shell)
+    is_template ${TARGET} || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
     _image_shell
+    ;;
+   compile-template)
+    exit_with_error 2 "Work in progress"
     ;;
    *)
     help_and_exit
-   
+    ;;
   esac
-  TARGET=${PWD}
-  [ ! -z "${1}" ] && TARGET="${1}"
 
-  # check if
   
 }
 
