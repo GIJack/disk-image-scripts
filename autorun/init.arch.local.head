@@ -1,0 +1,5 @@
+# Config for runonce.
+
+# NOTE: base config is already in init.arch.sh. See file for what is already
+# enabled before enabling additional software here.
+

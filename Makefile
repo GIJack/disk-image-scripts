@@ -4,11 +4,12 @@ install:
 	install -Dm 755 shrinkwrap_image.sh "$(DESTDIR)/$(PREFIX)/bin/shrinkwrap_image.sh"
 	install -Dm 755 init_image.sh "$(DESTDIR)/$(PREFIX)/bin/init_image.sh"
 	install -Dm 755 gen_template_image.sh "$(DESTDIR)/$(PREFIX)/bin/gen_template_image.sh"
+	install -Dm 755 autorun/init.arch.sh "$(DESTDIR)/usr/share/disk-image-scripts/init.arch.sh"
+	install -Dm 755 autorun/init.arch.local "$(DESTDIR)/usr/share/disk-image-scripts/init.arch.local.head"
 	install -Dm 644 man/init_image.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/init_image.1"
 	install -Dm 644 man/shrink_wrap.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/shrink_wrap.1"
 	install -Dm 644 man/mount_image.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/mount_image.1"
 	install -Dm 644 man/mount_image.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/gen_template_image.1"
-	install -dm 755 "$(DESTDIR)/usr/share/disk-image-scripts/"
 	cp -ra default_template "$(DESTDIR)/usr/share/disk-image-scripts/default_template"
 	
 remove:
@@ -16,6 +17,8 @@ remove:
 	rm "$(DESTDIR)/$(PREFIX)/bin/shrinkwrap_image.sh"
 	rm "$(DESTDIR)/$(PREFIX)/bin/init_image.sh"
 	rm "$(DESTDIR)/$(PREFIX)/bin/gen_template_image.sh"
+	rm "$(DESTDIR)/usr/share/disk-image-scripts/init.arch.sh"
+	rm "$(DESTDIR)/usr/share/disk-image-scripts/init.arch.local.head"
 	rm "$(DESTDIR)/$(PREFIX)/share/man/man1/init_image.1"
 	rm "$(DESTDIR)/$(PREFIX)/share/man/man1/shrink_wrap.1"
 	rm "$(DESTDIR)/$(PREFIX)/share/man/man1/mount_image.1"

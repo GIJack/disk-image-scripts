@@ -1,0 +1,21 @@
+# Config for runonce.
+
+# NOTE: base config is already in init.arch.sh. See file for what is already
+# enabled before enabling additional software here.
+
+# Name of kernel package. Default is "linux"
+KERNEL="linux"
+
+# As of now, only syslinux is supported. Added for future compatibility
+BOOTLOADER="syslinux"
+
+# List of additional services to enable.
+SYSTEMSERVICES=""
+
+# List of additional packages to install, beyond base. Text editors are not
+# provided by default. It would be wise to pick one
+EXTRAPACKAGES="nano"
+#EXTRA_PACKAGES="nano vi emacs-nox"
+
+# List of extra kernel modules to be included in the initcpio image
+EXTRAINTMODULES=""
