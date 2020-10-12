@@ -235,7 +235,7 @@ _image_shell(){
 
 main() {
   TARGET=${PWD}
-  [ ! -z "${1}" ] && TARGET=${$1}
+  [ ! -z "${1}" ] && TARGET="${1}"
 }
 
 main "${@}"
