@@ -251,7 +251,7 @@ _compile_template(){
   parse_environment "${target}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
 
   # Generate Slug
-  if [[ "${PROJECTNAME}" != "Unknown Arch Project" || "${PROJECTNAME}" != "None" || "${PROJECTNAME}" != "Unknown" || "${PROJECTNAME}" != "" ]];then
+  if [[ "${PROJECTNAME}" != "Unknown Arch Project" && "${PROJECTNAME}" != "None" && "${PROJECTNAME}" != "Unknown" && "${PROJECTNAME}" != "" ]];then
     PROJECT_SLUG="${PROJECTNAME,,}"
     PROJECT_SLUG="${PROJECT_SLUG// /}"
     PROJECT_SLUG="$(tr -cd "[:alnum:]" <<< $PROJECT_SLUG)"
