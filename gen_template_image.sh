@@ -176,7 +176,7 @@ is_template(){
 #--- Commands ---#
 _init_template() {
   # Create new template.
-
+  message "Initializing cloud image template at ${TARGET}"
   if is_template "${TARGET}";then
     exit_with_error 2 "${TARGET} is already a template, exiting..."
    elif [[ -f "${target}" || -c "${target}" || -b "${target}" || -p "${target}" ]];then
@@ -188,11 +188,13 @@ _init_template() {
 }
 
 _init_image() {
+  # generate the base image. download and install all packages into .img file
   local target="${PWD}"
   local mount_point="$(mktemp -d)"
   local mount_dev=""
   local mount_target=""
 
+  message "Performing Initial Install"
   parse_environment "${target}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
   init_image.sh -s ${IMGSIZE} "${target}/${BASE_IMAGE}" || exit_with_error 1 "Image initalization threw a code, quitting."
 
@@ -227,8 +229,10 @@ _image_shell(){
 
   # Run command
   if [ -z "${command}" ];then
+    message "Opening shell in base install"
     as_root arch-chroot "${mount_point}"
    else
+    message "Running ${command} in base install"
     as_root arch-chroot "${mount_point}" "${command}"
   fi
   
@@ -236,6 +240,24 @@ _image_shell(){
   mount_image umount ${mount_target} || warn "Unmount failed, please check"
   rmdir ${mount_point}
 }
+
+_compile_template(){
+  ## Put everything together into a completed template
+  # We can update this later with a better name from metadata
+  local use_generic_name=0
+  local outfile_generic="generic_template.img"
+  local outfile_name=""
+  # first, read the environment file
+  parse_environment "${target}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
+
+  # Generate Slug
+  if [[ "${PROJECTNAME}" != "Unknown Arch Project" || "${PROJECTNAME}" != "None" || "${PROJECTNAME}" != "Unknown" || "${PROJECTNAME}" != "" ]];then
+    PROJECT_SLUG="${PROJECTNAME,,}"
+    PROJECT_SLUG="${PROJECT_SLUG// /}"
+    PROJECT_SLUG="$(tr -cd "[:alnum:]" <<< $PROJECT_SLUG)"
+  fi
+}
+
 #/--- Commands ---/#
 
 main() {
@@ -245,20 +267,22 @@ main() {
   SCRIPT_CMD="${1}"
   [ ! -z "${2}" ] TARGET="${2}"
 
+  # Step two, run subcommand
   # First parameter is subcommand
   case ${SCRIPT_CMD} in
    init-template)    
     _init_template
     ;;
    init-image)
-    is_template ${TARGET} || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
+    is_template "${TARGET}" || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
     _init_image
     ;;
    image-shell)
-    is_template ${TARGET} || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
+    is_template "${TARGET}" || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
     _image_shell
     ;;
    compile-template)
+    is_template "${TARGET}" || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
     exit_with_error 2 "Work in progress"
     ;;
    *)
@@ -266,7 +290,7 @@ main() {
     ;;
   esac
 
-  
+  exit 0
 }
 
 main "${@}"
