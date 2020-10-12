@@ -35,9 +35,15 @@ METADATA
 --------
 The following keys are recognized as metadata:
 
+OSTYPE			Name of Linux Distro. For use with cloud-init, and must
+			use same format. As of now only "arch" is supported
+
 FILEFORMAT		Interger with what version of this spec this is using.
+			Relevant to OSTYPE.
 
 0	pre-release experimental
+
+
 
 --> PROJECT
 

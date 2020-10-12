@@ -2,6 +2,7 @@
 
 # Metadata and defaults file for Disk-Image-Script's gen_template.image.sh.
 # This will overwrite anything in init.arch.local.
+OSTYPE="arch"
 FILEFORMAT=0
 
 ### Project Metadata ###
