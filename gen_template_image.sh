@@ -31,6 +31,8 @@ profile.
 	gen_template_image.sh [command] <arguments>
 
 	COMMANDS:
+	
+	help			This message.
 
 	init-template		Generate blank profile. rootoverlay/ directory
 				and default template.rc. If no argument is
@@ -234,8 +236,33 @@ _image_shell(){
 #/--- Commands ---/#
 
 main() {
+  TARGET="${PWD}"
+  SCRIPT_CMD="${1}"
+  # Set this initially.
+
+  # First parameter is subcommand
+  case ${SCRIPT_CMD} in
+   help|\?)
+    help_and_exit
+    ;;
+   init-template)
+    _init_template
+    ;;
+   init-image)
+    _init_template
+    ;;
+   image-shell)
+    _image_shell
+    ;;
+   *)
+    help_and_exit
+   
+  esac
   TARGET=${PWD}
   [ ! -z "${1}" ] && TARGET="${1}"
+
+  # check if
+  
 }
 
 main "${@}"
