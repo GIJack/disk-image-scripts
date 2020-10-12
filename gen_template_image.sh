@@ -24,7 +24,7 @@ help_and_exit() {
 gen_template_image.sh:
 
 Generate an Cloud Template Image.(Based on Arch Linux), based on a
-profile. Needs cloud-init-extra package from AUR available in a custom repo.
+profile.
 
 
 	USAGE:
@@ -199,7 +199,7 @@ _init_image() {
   parse_environment "${target}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
   init_image.sh -s ${IMGSIZE} "${target}/${BASE_IMAGE}" || exit_with_error 1 "Image initalization threw a code, quitting."
   mount_image.sh mount -m "${mount_point}" "${target}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
-  pacstrap "${mount_point}" ${BASE_PACKAGES} ${EXTRAPACKAGES} || exit_with_error 1 "Base install failed. Please check output."
+  pacstrap "${mount_point}"${KERNEL} ${BOOTLOADER} ${BASE_PACKAGES} ${EXTRAPACKAGES} || exit_with_error 1 "Base install failed. Please check output."
   mount_image umount ${mount_target} || warn "Unmount failed, please check"
   rmdir ${mount_point}
 }
