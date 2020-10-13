@@ -20,6 +20,9 @@ SCRIPT_BASE_DIR="/usr/share/disk-image-scripts/"
 
 # /Defaults #
 
+BOLD="$(tput bold)"
+NOCOLOR="$(tput sgr0)"
+
 help_and_exit() {
   cat 1>&2 << EOF
 gen_template_image.sh:
@@ -81,7 +84,7 @@ message() {
 }
 
 submsg() {
-  echo "==>	${@}"
+  echo "===>	${@}"
 }
 
 exit_with_error() {
@@ -189,7 +192,6 @@ _init_template() {
 
 _init_image() {
   # generate the base image. download and install all packages into .img file
-  local target="${PWD}"
   local mount_point="$(mktemp -d)"
   local mount_dev=""
   local mount_target=""
@@ -203,6 +205,7 @@ _init_image() {
   mount_target=${mount_dev: -1}
 
   pacstrap "${mount_point}"${KERNEL} ${BOOTLOADER} ${BASE_PACKAGES} ${EXTRAPACKAGES} || exit_with_error 1 "Base install failed. Please check output."
+
   mount_image umount ${mount_target} || warn "Unmount failed, please check"
   rmdir ${mount_point}
 }
@@ -244,18 +247,74 @@ _image_shell(){
 _compile_template(){
   ## Put everything together into a completed template
   # We can update this later with a better name from metadata
-  local use_generic_name=0
+  local mount_point="$(mktemp -d)"
+  local mount_dev=""
+  local mount_target=""
+  local -i use_generic_name=0
   local outfile_generic="generic_template.img"
   local outfile_name=""
   # first, read the environment file
   parse_environment "${target}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
 
-  # Generate Slug
+  ## Generate output file name
+  # Generate Slug from project name.
   if [[ "${PROJECTNAME}" != "Unknown Arch Project" && "${PROJECTNAME}" != "None" && "${PROJECTNAME}" != "Unknown" && "${PROJECTNAME}" != "" ]];then
     PROJECT_SLUG="${PROJECTNAME,,}"
     PROJECT_SLUG="${PROJECT_SLUG// /}"
     PROJECT_SLUG="$(tr -cd "[:alnum:]" <<< $PROJECT_SLUG)"
+    use_generic_name=1
+    outfile_name+="${PROJECT_SLUG}_"
   fi
+  # Add OS archecture
+  [ -z ${PROJECTARCH} && ${PROJECTARCH} != "any" ] && outfile_name+="${PROJECTARCH}_"
+  # Project Version
+  if [ -z ${PROJECTVER} && ${PROJECTVER} -ne 0 && ${PROJECTVER} -eq ${PROJECTVER} ];then
+    outfile_name+="${PROJECTVER}_"
+   else
+    # Datestamp. If there is no version, use a datestamp, ArchLinux style
+    outfile_name+="$(date +%Y%m%d)_"
+  fi
+  # removing trailing "_"
+  [ ${outfile_name: -1} == "_" ] && outfile_name=${outfile_name:0:-1}
+  # add .img suffix
+  outfile_name=+".img"
+  use_generic_name && outfile_name="${outfile_generic}"
+
+  ## Generate final init.arch.local
+  touch "${TEMPLATE}/init.arch.conf" || exit_with_error 1 "Could not write to target, please check permissions."
+  cat > "${TEMPLATE}/init.arch.conf" << EOF
+KERNEL="${KERNEL}"
+BOOTLOADER="${BOOTLOADER}"
+SYSTEMSERVICES="${SYSTEMSERVICES}"
+EXTRAPACKAGES="${EXTRAPACKAGES}"
+EXTRAINTMODULES="${EXTRAINITMODULES}"
+EOF
+
+  ## Start the work
+  message "Generating template: ${outfile_name}"
+  # Make output file
+  submsg "copying base image to output image"
+  cp "${TARGET}/${BASE_IMAGE}" "${TARGET}/${outfile_name}" || exit_with_error 1 "couldn't make output file, check available disk space"
+  # Set up mount and get unmount data
+  mount_image.sh mount -m "${mount_point}" "${TARGET}/${outfile_name}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
+  mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
+  mount_target=${mount_dev: -1}
+
+  [[ ! -d "${TARGET}/rootoverlay/" || ]]
+  # copy template
+  submsg "copying template"
+  cp -ra "${TARGET}"/rootoverlay/* "${mount_point}/" || warn "Copying root template threw a code, check it"
+  cp "${SCRIPT_BASE_DIR}/init.arch.sh" "${mount_point}"
+
+  # initialize with script
+  submsg "Initalizing..."
+  as_root arch-chroot "${mount_point}" "bash /init.arch.sh;exit" || warn "Initialization failed!"
+
+  # Cleanup
+  submsg "Cleanup"
+  mount_image umount ${mount_target} || warn "Unmount failed, please check"
+  rmdir "${mount_point}"
+  submsg "Done!"
 }
 
 #/--- Commands ---/#
@@ -283,7 +342,7 @@ main() {
     ;;
    compile-template)
     is_template "${TARGET}" || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
-    exit_with_error 2 "Work in progress"
+    _compile_template
     ;;
    *)
     help_and_exit

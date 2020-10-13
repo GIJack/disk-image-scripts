@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ## DEFAULTS ##
-# default user config. This is can be overridden in /etc/cloud/init.arch.local
+# default user config. This is can be overridden in /etc/cloud/init.arch.conf
 
 # Name of kernel package
 KERNEL="linux"
@@ -13,7 +13,7 @@ BOOTLOADER="syslinux"
 
 ## BASE INSTALL ##
 # Hardcoded always install packages
-local_config="/etc/cloud/init.arch.local"
+local_config="/etc/cloud/init.arch.conf"
 # packages that need to be installed
 system_packages="base cloud-init cloud-utils openssh mkinitcpio"
 # systemd services that need to be enabled
@@ -154,9 +154,9 @@ main() {
   if [ -f "${local_config}" ];then
     parse_environment "${local_config}"
    else
-    warn "${local_config} not found!, default is in /usr/share/cloud-init-extra/init.arch.local.default"
+    warn "${local_config} not found!, default is in /usr/share/cloud-init-extra/init.arch.config"
   fi
-  install_packages || exit_with_error 1 "Could not install necessary packages needed for script to run. Please check install"
+  #install_packages || exit_with_error 1 "Could not install necessary packages needed for script to run. Please check install"
   case ${BOOTLOADER} in
    syslinux)
     install_syslinux || exit_code+=1
