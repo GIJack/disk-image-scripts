@@ -317,7 +317,7 @@ EOF
 
   # Shrinkwrap
   submsg "Shrinkwrapping..."
-  shrinkwrap_image.sh "${TARGET}/${outfile_name}"
+  shrinkwrap_image.sh -z "${TARGET}/${outfile_name}"
   submsg "Done!"
 }
 
