@@ -314,6 +314,10 @@ EOF
   submsg "Cleanup"
   mount_image umount ${mount_target} || warn "Unmount failed, please check"
   rmdir "${mount_point}"
+
+  # Shrinkwrap
+  submsg "Shrinkwrapping..."
+  shrinkwrap_image.sh "${TARGET}/${outfile_name}"
   submsg "Done!"
 }
 
