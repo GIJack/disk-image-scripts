@@ -198,6 +198,9 @@ _init_image() {
 
   message "Performing Initial Install"
   parse_environment "${target}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
+
+  # If install exists, delete it first
+  [ -f "${target}/${BASE_IMAGE}" ] && rm -f "${target}/${BASE_IMAGE}"
   init_image.sh -s ${IMGSIZE} "${target}/${BASE_IMAGE}" || exit_with_error 1 "Image initalization threw a code, quitting."
 
   mount_image.sh mount -m "${mount_point}" "${target}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
@@ -293,17 +296,18 @@ EOF
   ## Start the work
   message "Generating template: ${outfile_name}"
   # Make output file
-  submsg "copying base image to output image"
+  submsg "Copying base image to output image"
   cp "${TARGET}/${BASE_IMAGE}" "${TARGET}/${outfile_name}" || exit_with_error 1 "couldn't make output file, check available disk space"
   # Set up mount and get unmount data
   mount_image.sh mount -m "${mount_point}" "${TARGET}/${outfile_name}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
   mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
   mount_target=${mount_dev: -1}
 
-  [[ ! -d "${TARGET}/rootoverlay/" || ]]
   # copy template
-  submsg "copying template"
-  cp -ra "${TARGET}"/rootoverlay/* "${mount_point}/" || warn "Copying root template threw a code, check it"
+  submsg "Copying Overlay..."
+  if [ -d "${TARGET}"/rootoverlay/ ];then
+    cp -ra "${TARGET}"/rootoverlay/* "${mount_point}/" || warn "Copying root template threw a code, check it"
+  fi
   cp "${SCRIPT_BASE_DIR}/init.arch.sh" "${mount_point}"
 
   # initialize with script
@@ -317,7 +321,7 @@ EOF
 
   # Shrinkwrap
   submsg "Shrinkwrapping..."
-  shrinkwrap_image.sh -z "${TARGET}/${outfile_name}"
+  shrinkwrap_image.sh -z "${TARGET}/${outfile_name}"  || warn "Shrinkwrap threw a code"
   submsg "Done!"
 }
 
