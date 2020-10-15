@@ -332,7 +332,7 @@ main() {
   # Step one, resolve command and target
   TARGET="${PWD}"
   SCRIPT_CMD="${1}"
-  [ ! -z "${2}" ] TARGET="${2}"
+  [ ! -z "${2}" ] && TARGET="${2}"
 
   # Step two, run subcommand
   # First parameter is subcommand
