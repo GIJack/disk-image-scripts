@@ -197,13 +197,13 @@ _init_image() {
   local mount_target=""
 
   message "Performing Initial Install"
-  parse_environment "${target}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
+  parse_environment "${TARGET}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
 
   # If install exists, delete it first
-  [ -f "${target}/${BASE_IMAGE}" ] && rm -f "${target}/${BASE_IMAGE}"
-  init_image.sh -s ${IMGSIZE} "${target}/${BASE_IMAGE}" || exit_with_error 1 "Image initalization threw a code, quitting."
+  [ -f "${TARGET}/${BASE_IMAGE}" ] && rm -f "${TARGET}/${BASE_IMAGE}"
+  init_image.sh -s ${IMGSIZE} "${TARGET}/${BASE_IMAGE}" || exit_with_error 1 "Image initalization threw a code, quitting."
 
-  mount_image.sh mount -m "${mount_point}" "${target}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
+  mount_image.sh mount -m "${mount_point}" "${TARGET}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
   mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
   mount_target=${mount_dev: -1}
 
@@ -257,7 +257,7 @@ _compile_template(){
   local outfile_generic="generic_template.img"
   local outfile_name=""
   # first, read the environment file
-  parse_environment "${target}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
+  parse_environment "${TARGET}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
 
   ## Generate output file name
   # Generate Slug from project name.
