@@ -17,7 +17,7 @@ TEMPLATE_INDEX="template.rc"
 IMGSIZE=20480 # 20GB
 BASE_PACKAGES="base cloud-init cloud-utils openssh mkinitcpio"
 SCRIPT_BASE_DIR="/usr/share/disk-image-scripts/"
-
+COMPRESS_IMAGE="N"
 # /Defaults #
 
 BOLD="$(tput bold)"
@@ -227,7 +227,8 @@ _image_shell(){
   [ ! -z "${1}" ] && local command="${1};exit"
 
   [ ! -f "${TARGET}/${BASE_IMAGE}" ] || exit_with_error 1 "Base install cannot be found. perhaps you forgot to init-image?"
-
+  
+  message Opening a chroot in image
   # Set up mount and get unmount data
   mount_image.sh mount -m "${mount_point}" "${TARGET}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
   mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
@@ -320,8 +321,15 @@ EOF
   rmdir "${mount_point}"
 
   # Shrinkwrap
-  submsg "Shrinkwrapping..."
-  shrinkwrap_image.sh -z "${TARGET}/${outfile_name}"  || warn "Shrinkwrap threw a code"
+  
+  if [ ${COMPRESS_IMAGE} == "Y" ];then
+    submsg "Shrinkwrapping..."
+    if [ -z "${COMPRESS_OPTS}" ];then
+       shrinkwrap_image.sh -z "${TARGET}/${outfile_name}" -g "${COMPRESS_OPTS}" || warn "Shrinkwrap threw a code"
+      else
+       shrinkwrap_image.sh -z "${TARGET}/${outfile_name}"  || warn "Shrinkwrap threw a code"
+    fi
+  fi
   submsg "Done!"
 }
 

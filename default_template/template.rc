@@ -4,6 +4,8 @@
 # This will overwrite anything in init.arch.local.
 OSTYPE="arch"
 FILEFORMAT=0
+COMPRESS_IMAGE="Y"
+COMPRESS_OPTS=""
 
 ### Project Metadata ###
 

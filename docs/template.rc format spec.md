@@ -40,10 +40,14 @@ OSTYPE			Name of Linux Distro. For use with cloud-init, and must
 
 FILEFORMAT		Interger with what version of this spec this is using.
 			Relevant to OSTYPE.
-
+Ver	Description
 0	pre-release experimental
 
-
+COMPRESS_IMAGE		Boolean. If we want to compress final output with gzip.
+			"Y" compresses, everything else is a no.
+			
+COMPRESS_OPTS		Command line parameters to pass to gzip for use with
+			COMPRESS_IMAGE. defaults to none
 
 --> PROJECT
 
