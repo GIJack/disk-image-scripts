@@ -72,7 +72,7 @@ profile.
 	    rootoverlay/ - directory with a root overlay. This gets applied on
 	    top of base install. Will overwrite any file that exists.
 	    
-	    rootoverlay/etc/cloud/int.arch.local - base configuration script
+	    rootoverlay/etc/cloud/int.arch.conf - base configuration script
 	    with list of packages, system services and kernel modules loaded by
 	    mkinitcpio.
 EOF
