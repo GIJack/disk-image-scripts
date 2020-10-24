@@ -16,7 +16,7 @@ BASE_IMAGE="base-install.img"
 TEMPLATE_INDEX="template.rc"
 IMGSIZE=20480 # 20GB
 BASE_PACKAGES="base cloud-init cloud-utils openssh mkinitcpio"
-SCRIPT_BASE_DIR="/usr/share/disk-image-scripts/"
+SCRIPT_BASE_DIR="/usr/share/disk-image-scripts"
 COMPRESS_IMAGE="N"
 # /Defaults #
 
@@ -186,8 +186,10 @@ _init_template() {
      exit_with_error 2 "${TARGET} exists as non-directory file or object, fail!"
    elif [ -d "${TARGET}" ];then
     warn "${TARGET} exists as a directory, but not a profile, initializing anyway"
+   else
+    mkdir "${TARGET}"
   fi
-  cp -ra "${SCRIPT_BASE_DIR}/default_template/*" "${TARGET}" || exit_with_error 1 "Couldn't copy files, template initialization failed!"
+  cp -ra "${SCRIPT_BASE_DIR}/default_template/"* "${TARGET}" || exit_with_error 1 "Couldn't copy files, template initialization failed!"
 }
 
 _init_image() {
