@@ -5,7 +5,7 @@ install:
 	install -Dm 755 init_image.sh "$(DESTDIR)/$(PREFIX)/bin/init_image.sh"
 	install -Dm 755 gen_template_image.sh "$(DESTDIR)/$(PREFIX)/bin/gen_template_image.sh"
 	install -Dm 755 autorun/init.arch.sh "$(DESTDIR)/usr/share/disk-image-scripts/init.arch.sh"
-	install -Dm 755 autorun/init.arch.local "$(DESTDIR)/usr/share/disk-image-scripts/init.arch.conf"
+	install -Dm 755 autorun/init.arch.conf "$(DESTDIR)/usr/share/disk-image-scripts/init.arch.conf"
 	install -Dm 644 man/init_image.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/init_image.1"
 	install -Dm 644 man/shrink_wrap.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/shrink_wrap.1"
 	install -Dm 644 man/mount_image.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/mount_image.1"
