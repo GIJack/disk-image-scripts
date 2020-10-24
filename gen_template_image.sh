@@ -225,11 +225,11 @@ _image_shell(){
   local mount_point="$(mktemp -d)"
   local mount_dev=""
   local mount_target=""
-  [ ! -z "${1}" ] && local command="${1};exit"
+  local command=""
+  [ ! -z "${1}" ] && command="${1};exit"
 
   [ ! -f "${TARGET}/${BASE_IMAGE}" ] || exit_with_error 1 "Base install cannot be found. perhaps you forgot to init-image?"
   
-  message Opening a chroot in image
   # Set up mount and get unmount data
   mount_image.sh mount -m "${mount_point}" "${TARGET}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
   mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
