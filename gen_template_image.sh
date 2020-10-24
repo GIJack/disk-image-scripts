@@ -142,8 +142,8 @@ parse_environment(){
 
     # Zero check. If after cleaning either the key or value is null, then
     # write nothing
-    [ -z ${key} ] && continue
-    [ -z $value ] && continue
+    [ -z "${key}" ] && continue
+    [ -z "${value}" ] && continue
 
     # write sanitized values to temp file
     echo "${key}=${value}" >> ${safe_config}
@@ -169,8 +169,7 @@ is_template(){
   # Metadata
   [[ -z ${PROJECTNAME} || -z ${PROJECTVER} || -z ${PROJECTARCH} ]] && return 1
   # System
-  [[ -z ${KERNEL} || -z ${BOOTLOADER} || -z ${SYSTEMSERVICES} ]] && return 1
-  [[ -z ${EXTRAPACKAGES} || -z ${EXTRAINTMODULES} ]] && return 1
+  [[ -z ${KERNEL} || -z ${BOOTLOADER} ]] && return 1
   
   # If nothing fails, check passes
   return 0
