@@ -226,7 +226,7 @@ _image_shell(){
   local mount_dev=""
   local mount_target=""
   local command=""
-  [ ! -z "${1}" ] && command="${1};exit"
+  [ ! -z "${1}" ] && command="${1}"
 
   [ ! -f "${TARGET}/${BASE_IMAGE}" ] && exit_with_error 1 "Base install cannot be found. perhaps you forgot to init-image?"
   
@@ -353,9 +353,13 @@ main() {
     is_template "${TARGET}" || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
     _init_image
     ;;
+   update-image)
+    is_template "${TARGET}" || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
+    _update_image
+    ;;
    image-shell)
     is_template "${TARGET}" || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
-    _image_shell
+    _image_shell "${@:3}"
     ;;
    compile-template)
     is_template "${TARGET}" || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
