@@ -206,11 +206,11 @@ _init_image() {
 
   mount_image.sh mount -m "${mount_point}" "${TARGET}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
   mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
-  mount_target=${mount_dev: -1}
+  mount_target=${mount_dev: -3:1}
 
   as_root pacstrap "${mount_point}" ${KERNEL} ${BOOTLOADER} ${BASE_PACKAGES} ${EXTRAPACKAGES} || exit_with_error 1 "Base install failed. Please check output."
 
-  mount_image umount ${mount_target} || warn "Unmount failed, please check"
+  mount_image.sh umount ${mount_target} || warn "Unmount failed, please check"
   rmdir ${mount_point}
 }
 
@@ -228,12 +228,12 @@ _image_shell(){
   local command=""
   [ ! -z "${1}" ] && command="${1};exit"
 
-  [ ! -f "${TARGET}/${BASE_IMAGE}" ] || exit_with_error 1 "Base install cannot be found. perhaps you forgot to init-image?"
+  [ ! -f "${TARGET}/${BASE_IMAGE}" ] && exit_with_error 1 "Base install cannot be found. perhaps you forgot to init-image?"
   
   # Set up mount and get unmount data
   mount_image.sh mount -m "${mount_point}" "${TARGET}/${BASE_IMAGE}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
   mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
-  mount_target=${mount_dev: -1}
+  mount_target=${mount_dev: -3:1}
 
   # Run command
   if [ -z "${command}" ];then
@@ -245,7 +245,7 @@ _image_shell(){
   fi
   
   # Cleanup
-  mount_image umount ${mount_target} || warn "Unmount failed, please check"
+  mount_image.sh umount ${mount_target} || warn "Unmount failed, please check"
   rmdir ${mount_point}
 }
 
@@ -303,7 +303,7 @@ EOF
   # Set up mount and get unmount data
   mount_image.sh mount -m "${mount_point}" "${TARGET}/${outfile_name}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
   mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
-  mount_target=${mount_dev: -1}
+  mount_target=${mount_dev: -3:1}
 
   # copy template
   submsg "Copying Overlay..."
