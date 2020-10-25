@@ -13,7 +13,7 @@ BOOTLOADER="syslinux"
 
 ## BASE INSTALL ##
 # Hardcoded always install packages
-local_config="/etc/cloud/init.arch.conf"
+local_config="/init.arch.conf"
 # packages that need to be installed
 system_packages="base cloud-init cloud-utils openssh mkinitcpio"
 # systemd services that need to be enabled
