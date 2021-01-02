@@ -3,7 +3,6 @@
 # Mount a disk img(.img) See help below
 #
 # error codes 0:Success 1:Operations Fail 2:Abort 4:Invalid User Input
-LOOP_DEV=$(losetup -f)
 PART_N=1
 MOUNT_POINT="${HOME}/mnt"
 ROOT_METHOD="sudo"
@@ -63,11 +62,12 @@ as_root() {
 _mount-img() {
   local -i local_exit=0
   local filename="${1}"
-  message "Mounting ${filename} on ${LOOP_DEV} on ${MOUNT_POINT}"
+  local loop_dev=$(as_root losetup -f)
+  message "Mounting ${filename} on ${loop_dev} on ${MOUNT_POINT}"
   [ -z "${MOUNT_POINT}" ] && exit_with_error 4 "No mountpoint specified with -m see --help"
   [ -d "${MOUNT_POINT}" ] || exit_with_error 4 "${MOUNT_POINT} is not a directory, exiting!"
-  as_root losetup -P ${LOOP_DEV} "${filename}" || local_exit+=1
-  as_root mount ${LOOP_DEV}p${PART_N} ${MOUNT_POINT} || local_exit+=1
+  as_root losetup -P ${loop_dev} "${filename}" || local_exit+=1
+  as_root mount ${loop_dev}p${PART_N} ${MOUNT_POINT} || local_exit+=1
 
   return ${local_exit}
 }
@@ -75,12 +75,12 @@ _mount-img() {
 _umount-img() {
   local -i local_exit=0
   index=${1}
-  LOOP_DEV=/dev/loop${index}
+  local loop_dev=/dev/loop${index}
 
-  message "UnMounting ${MOUNT_POINT} from ${LOOP_DEV}"
+  message "UnMounting ${MOUNT_POINT} from ${loop_dev}"
 
-  as_root umount ${LOOP_DEV}p${PART_N} || local_exit+=1
-  as_root losetup -d ${LOOP_DEV} || local_exit+=1
+  as_root umount ${loop_dev}p${PART_N} || local_exit+=1
+  as_root losetup -d ${loop_dev} || local_exit+=1
 
   return ${local_exit}
 }
