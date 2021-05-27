@@ -211,7 +211,7 @@ _init_image() {
   as_root pacstrap "${mount_point}" ${KERNEL} ${BOOTLOADER} ${BASE_PACKAGES} ${EXTRAPACKAGES} || exit_with_error 1 "Base install failed. Please check output."
 
   mount_image.sh umount ${mount_target} || warn "Unmount failed, please check"
-  rmdir ${mount_point}
+  rmdir "${mount_point}"
 }
 
 _update_image(){

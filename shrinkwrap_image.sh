@@ -10,6 +10,7 @@
 
 # Defaults #
 LOOP_DEV=$(losetup -f)
+LOOP_DEV="INVALID"
 PART_N=1
 MOUNT_POINT="$(mktemp -d)"
 ROOT_METHOD="sudo"
@@ -97,7 +98,7 @@ cleanup_abort_fail() {
   local message="${1}"
   as_root umount -f ${LOOP_DEV}p${PART_N} &> /dev/null
   as_root losetup -D ${LOOP_DEV}
-  rmdir ${MOUNT_POINT} # mktemp directory
+  rmdir ${MOUNT_POINT} || warn "Could not cleanup temp dir, check manually!"# mktemp directory
   exit_with_error 2 "${message}"
 }
 
@@ -228,7 +229,7 @@ if [ ${?} -ne 0 ];then
     warn "Could not stop loop device ${LOOP_DEV}, you should do this manually"
     exit_code+=1
 fi
-  rmdir ${MOUNT_POINT} # mktemp directory
+  rmdir ${MOUNT_POINT} || warn "Could not remove temp directory, check manually"# mktemp directory
 
   _shrink_image ${filename} ${disk_end}
   if [ ${?} -ne 0 ];then
