@@ -9,7 +9,7 @@ install:
 	install -Dm 644 man/init_image.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/init_image.1"
 	install -Dm 644 man/shrink_wrap.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/shrink_wrap.1"
 	install -Dm 644 man/mount_image.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/mount_image.1"
-	install -Dm 644 man/mount_image.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/gen_template_image.1"
+	install -Dm 644 man/gen_template_image.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/gen_template_image.1"
 	cp -ra default_template "$(DESTDIR)/usr/share/disk-image-scripts/default_template"
 	
 remove:
