@@ -10,7 +10,6 @@
 # Defaults #
 
 PART_N=1
-MOUNT_POINT="$(mktemp -d)"
 ROOT_METHOD="sudo"
 BASE_IMAGE="base-install.img"
 TEMPLATE_INDEX="template.rc"
@@ -252,7 +251,7 @@ _image_shell(){
 _compile_template(){
   ## Put everything together into a completed template
   # We can update this later with a better name from metadata
-  local mount_point="$(mktemp -d)"
+  local mount_point=""
   local mount_dev=""
   local mount_target=""
   local outfile_generic="generic_arch_template.img"
@@ -301,6 +300,7 @@ EOF
   submsg "Copying base image to output image"
   cp "${TARGET}/${BASE_IMAGE}" "${TARGET}/${outfile_name}" || exit_with_error 1 "couldn't make output file, check available disk space"
   # Set up mount and get unmount data
+  mount_point="$(mktemp -d)"
   mount_image.sh mount -m "${mount_point}" "${TARGET}/${outfile_name}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
   mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
   mount_target=${mount_dev: -3:1}
@@ -322,7 +322,7 @@ EOF
   as_root rm -f "${mount_point}/init.arch.sh"
   as_root rm -f "${mount_point}/init.arch.conf"
   mount_image.sh umount ${mount_target} || warn "Unmount failed, please check"
-  rmdir "${mount_point}"
+  rmdir "${mount_point}" || warn "Could not delete temporary mountpoint directory"
   rm -f "${TARGET}/init.arch.conf"
 
   # Shrinkwrap
