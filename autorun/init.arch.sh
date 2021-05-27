@@ -159,15 +159,15 @@ main() {
   #install_packages || exit_with_error 1 "Could not install necessary packages needed for script to run. Please check install"
   case ${BOOTLOADER} in
    syslinux)
-    install_syslinux || exit_code+=1
+    install_syslinux || exit_code+=1; warn "Syslinux install failed"
     ;;
    *)
     warn "Bootloader ${BOOTLOADER} is unsupported, NO INSTALLED BOOTLOADER CONFIGURED!"
     exit_code+=1
     ;;
   esac
-  enable_services  || exit_code+=1
-  config_initcpio  || exit_code+=1
+  enable_services  || exit_code+=1 ; warn "systemctl enabled failed"
+  config_initcpio  || exit_code+=1 ; warn "initcpio config failed"
   message "Done!"
   [ $exit_code -ne 0 ] && exit_with_error 1 "${exit_code} errrors, check above output"
 }
