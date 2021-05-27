@@ -8,6 +8,7 @@ System requirements:
 --------------------
 1. Arch Linux
 2. qemu (uses qemu-img resize)
+3. GNU Parted(shrinkwrap uses this, looking to eliminate this)
 
 Right now, only MBR partitioning and ext4 filesystem are supported. In the
 future we may support GPT paritioning and xfs filesystems as well.
