@@ -38,7 +38,7 @@ AUTHOR_GPG_SIG="" # Must match AUTHOR_EMAIL
 FILESYSTEM="ext4"
 
 # Name of kernel package. Default is "linux"
-KERNEL="linux"
+KERNEL="linux-lts"
 
 # As of now, only syslinux is supported. Added for future compatibility
 BOOTLOADER="syslinux"
