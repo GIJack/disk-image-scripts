@@ -37,7 +37,7 @@ AUTHOR_GPG_SIG="" # Must match AUTHOR_EMAIL
 # Added for future compatibility. Does nothing, and EXT4 will always be used
 FILESYSTEM="ext4"
 
-# Name of kernel package. Default is "linux"
+# Name of kernel package. Default is Long Term Support Kernel "linux-lts"
 KERNEL="linux-lts"
 
 # As of now, only syslinux is supported. Added for future compatibility
