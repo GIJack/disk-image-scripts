@@ -126,6 +126,7 @@ install_syslinux() {
   local -i exit_n=0
   sed -i s/sda3/${root_part}/g /boot/syslinux/syslinux.cfg || exit_n+=1
   sed -i s/initramfs-linux/initramfs-${KERNEL}/g /boot/syslinux/syslinux.cfg || exit_n+=1
+  sed -i s/vmlinuz-linux/vmlinuz-${KERNEL}/g /boot/syslinux/syslinux.cfg || exit_n+=1
   syslinux-install_update -i -a -m || exit_n+=1
   return ${exit_n}
 }
