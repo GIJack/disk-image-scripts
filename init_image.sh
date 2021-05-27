@@ -10,7 +10,9 @@ IMG_SIZE=20480 # 20GB
 # bytestream to use for initial creation. Defaults to all zeros
 FILL_SRC=/dev/zero
 
-LOOP_DEV=$(losetup -f)
+#moved to main loop, this needs ROOT
+#LOOP_DEV=$(losetup -f)
+LOOP_DEV="INVALID"
 PART_N=1
 MOUNT_POINT="$(mktemp -d)"
 ROOT_METHOD="sudo"
@@ -156,6 +158,8 @@ main() {
 
   message "Making ${IMG_SIZE}M image file ${OUT_FILE}"
   as_root true # get root
+  
+  LOOP_DEV=$(as_root losetup -f)
 
   _create_blank_file || exit_with_error 1 "Could Not Generate Blank File, Exiting"
   
