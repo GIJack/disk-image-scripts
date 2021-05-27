@@ -310,8 +310,8 @@ EOF
   if [ -d "${TARGET}"/rootoverlay/ ];then
     as_root cp -r "${TARGET}"/rootoverlay/* "${mount_point}/" || warn "Copying root template threw a code, check it"
   fi
-  as_root cp "${SCRIPT_BASE_DIR}/init.arch.sh" "${mount_point}"
-  as_root cp "${TARGET}/init.arch.conf" "${mount_point}"
+  as_root cp "${SCRIPT_BASE_DIR}/init.arch.sh" "${mount_point}" || warn "Could not copy initialization script to chroot!"
+  as_root cp "${TARGET}/init.arch.conf" "${mount_point}" || exit_with_error 1 "Could not copy initialization config to chroot!"
 
   # initialize with script
   submsg "Running Initalization Script..."
