@@ -125,30 +125,34 @@ _resize_part() {
 
   # Grab size reported directly fromr resize2fs
   fs_size=$( as_root resize2fs -M ${LOOP_DEV}p${PART_N} 2> /dev/null | tail -2 | cut -d " " -f 7 )
-  fs_size=$(( $fs_size * 4096 )) # convert 4k blocks to bytes
-  disk_end=$(( $fs_size + $fs_null_space ))
+  #fs_size=$(( $fs_size * 4096 )) # convert 4k blocks to bytes, use with parted
+  fs_size=$(( $fs_size * 8 )) # convert 4k blocks to sectors(512B), use with sfdisk.
 
   # Compute new end location for partition, and disk
-  part_end=$(( ${fs_null_space} + ${fs_size} + 4096 ))
-  disk_end=$(( ${part_end} + 512 ))
+  part_end=$(( ${fs_null_space} + ( ${fs_size} * 512 ) + 512 ))
+  DISK_END=$(( ${part_end} + 512 ))
   # Resize partition. Stupid ugly hack that took all morning. GNU Parted
   # is a hot fucking mess. I am not sure whoever thought that this was
   # the best way of doing things or why the --script option doesn't
   # override all the confirm prompts
   # https://unix.stackexchange.com/questions/190317/gnu-parted-resizepart-in-script
-  as_root parted ---pretend-input-tty ${LOOP_DEV} &> /dev/null << EOF
-resizepart
-1
-${part_end}B
-Yes
-EOF
-  # sfdisk fails harder than parted
-  #echo ",${fs_size}" | as_root sfdisk -N ${PART_N} ${LOOP_DEV} # > /dev/null
+#  as_root parted ---pretend-input-tty ${LOOP_DEV} &> /dev/null << EOF
+#resizepart
+#1
+#${part_end}B
+#Yes
+#EOF  
+  #if [ ${?} -ne 0 ];then
+  #  local_exit+=1
+  #  warn "the nasty ugly parted hack shit itself, throwing error below"
+  #fi
   
+  # sfdisk fails harder than parted
+  echo ",${fs_size}" | as_root sfdisk -N ${PART_N} ${LOOP_DEV} # > /dev/null
   if [ ${?} -ne 0 ];then
     local_exit+=1
-    warn "the nasty ugly parted hack shit itself, throwing error below"
-  fi
+    warn "sfdisk fails, check output"
+  fi  
 
   return ${local_exit}
 }
@@ -209,7 +213,7 @@ main() {
 
   local filesize=$(ls -sh "${filename}"| cut -d " " -f 1)
   local filesize_new=""
-  declare -i disk_end=0
+  declare -i DISK_END=0
   
   message "Shrinking ${filename}(${filesize}) to its smallest possible size"
   as_root true || exit_with_error 4 "Could not authenticate, exiting..." # cache root password
@@ -233,7 +237,7 @@ if [ ${?} -ne 0 ];then
 fi
   rmdir ${MOUNT_POINT} || warn "Could not remove temp directory, check manually"# mktemp directory
 
-  _shrink_image ${filename} ${disk_end}
+  _shrink_image ${filename} ${DISK_END}
   if [ ${?} -ne 0 ];then
     warn "Could not shrink image"
     exit_code+=1
