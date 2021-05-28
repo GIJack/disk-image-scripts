@@ -4,7 +4,7 @@
 # default user config. This is can be overridden in /etc/cloud/init.arch.conf
 
 # Name of kernel package
-KERNEL="linux"
+KERNEL="linux-lts"
 
 # Name of bootloader. As of now, only syslinux is supported
 BOOTLOADER="syslinux"
@@ -155,9 +155,12 @@ main() {
   if [ -f "${local_config}" ];then
     parse_environment "${local_config}"
    else
-    warn "${local_config} not found!, default is in /usr/share/cloud-init-extra/init.arch.config"
+    warn "${local_config} not found!, default is in /usr/share/disk-image-scripts/init.arch.config"
   fi
   #install_packages || exit_with_error 1 "Could not install necessary packages needed for script to run. Please check install"
+  enable_services  || exit_code+=1 ; warn "systemctl enabled failed"
+  config_initcpio  || exit_code+=1 ; warn "initcpio config failed"
+  
   case ${BOOTLOADER} in
    syslinux)
     install_syslinux || exit_code+=1; warn "Syslinux install failed"
@@ -167,8 +170,7 @@ main() {
     exit_code+=1
     ;;
   esac
-  enable_services  || exit_code+=1 ; warn "systemctl enabled failed"
-  config_initcpio  || exit_code+=1 ; warn "initcpio config failed"
+
   message "Done!"
   [ $exit_code -ne 0 ] && exit_with_error 1 "${exit_code} errrors, check above output"
 }
