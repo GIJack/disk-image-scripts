@@ -269,7 +269,7 @@ _compile_template(){
     # Add OS archecture
     [[ ! -z ${PROJECTARCH} && ${PROJECTARCH} != "any" ]] && outfile_name+="${PROJECTARCH}_"
     # Project Version
-    if [[ -z ${PROJECTVER} && ${PROJECTVER} -ne 0 && ${PROJECTVER} -eq ${PROJECTVER} ]];then
+    if [[ ! -z ${PROJECTVER} && ${PROJECTVER} -ne 0 && ${PROJECTVER} -eq ${PROJECTVER} ]];then
       outfile_name+="${PROJECTVER}_"
      else
       # Datestamp. If there is no version, use a datestamp, ArchLinux style
