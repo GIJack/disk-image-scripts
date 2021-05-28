@@ -147,7 +147,7 @@ _resize_part() {
   #  warn "the nasty ugly parted hack shit itself, throwing error below"
   #fi
   
-  # sfdisk fails harder than parted
+  # sfdisk parted replacement
   echo ",${fs_size}" | as_root sfdisk -N ${PART_N} ${LOOP_DEV} # > /dev/null
   if [ ${?} -ne 0 ];then
     local_exit+=1
