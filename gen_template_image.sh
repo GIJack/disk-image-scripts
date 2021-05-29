@@ -318,7 +318,7 @@ EOF
   # initialize with script
   submsg "Running Initalization Script..."
   as_root arch-chroot "${mount_point}" "bash /init.arch.sh" || warn "Initialization failed!"
-
+  
   # Cleanup
   submsg "Cleanup"
   as_root rm -f "${mount_point}/init.arch.sh"
@@ -331,11 +331,26 @@ EOF
   
   if [ ${COMPRESSIMAGE} == "Y" ];then
     submsg "Shrinkwrapping..."
-    if [ -z "${COMPRESSOPTS}" ];then
-       shrinkwrap_image.sh -z "${TARGET}/${outfile_name}" -g "${COMPRESSOPTS}" || warn "Shrinkwrap threw a code"
+    if [ -z "${COMPRESS_OPTS}" ];then
+       shrinkwrap_image.sh  "${TARGET}/${outfile_name}" || warn "Shrinkwrap threw a code"
       else
-       shrinkwrap_image.sh -z "${TARGET}/${outfile_name}"  || warn "Shrinkwrap threw a code"
+       shrinkwrap_image.sh "${TARGET}/${outfile_name}" || warn "Shrinkwrap threw a code"
     fi
+    
+    submsg "Re-Initializing Syslinux"
+    mount_point="$(mktemp -d)"
+    mount_image.sh mount -m "${mount_point}" "${TARGET}/${outfile_name}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
+    mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
+    mount_target=${mount_dev: -3:1}
+    as_root arch-chroot "${mount_point}" "syslinux-install_update -i -a -m" || warn "syslinux re-initialization failed"
+
+    #Cleanup again
+    mount_image.sh umount ${mount_target} || warn "Unmount failed, please check"
+    rmdir "${mount_point}" || warn "Could not delete temporary mountpoint directory"
+
+    # compressing final image
+    submsg "Compressing Image"
+    gzip ${COMPRESSOPTS} "${TARGET}/${outfile_name}"
   fi
   submsg "Done!"
 }
