@@ -231,10 +231,10 @@ main() {
   _resize_part || cleanup_abort_fail "Could not resize partition, you might need to clean up mount points locally"
 
   _destroy-loop
-if [ ${?} -ne 0 ];then
+  if [ ${?} -ne 0 ];then
     warn "Could not stop loop device ${LOOP_DEV}, you should do this manually"
     exit_code+=1
-fi
+  fi
   rmdir ${MOUNT_POINT} || warn "Could not remove temp directory, check manually"# mktemp directory
 
   _shrink_image ${filename} ${DISK_END}
