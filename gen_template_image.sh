@@ -16,7 +16,8 @@ TEMPLATE_INDEX="template.rc"
 IMGSIZE=20480 # 20GB
 BASE_PACKAGES="base cloud-init cloud-utils openssh mkinitcpio"
 SCRIPT_BASE_DIR="/usr/share/disk-image-scripts"
-COMPRESS_IMAGE="N"
+PACKAGE_LIST_FILE="addedpacks"
+COMPRESS_IMAGE="Y"
 TIMEZONE="UTC"
 # /Defaults #
 
@@ -154,6 +155,15 @@ parse_environment(){
   rm -f ${safe_config}
 }
 
+parse_package_file() {
+   # inputs a filename with a list of packages, one per line, # comment
+   # no space
+   local in_file="${1}"
+   
+   packages="$(cut -d '#' -f 1 < ${in_file})"
+   echo ${packages}
+}
+
 is_template(){
   # Check if directory is template. if no directory is specified use $PWD
   # returns 0 if True, 1 if False
@@ -196,6 +206,8 @@ _init_image() {
   local mount_point="$(mktemp -d)"
   local mount_dev=""
   local mount_target=""
+  local packages_from_file=""
+  [ -f ${PACKAGE_LIST_FILE} ] && packages_from_file=$( parse_package_file "${TARGET}/${PACKAGE_LIST_FILE}" )
 
   message "Performing Initial Install"
   parse_environment "${TARGET}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
@@ -208,7 +220,7 @@ _init_image() {
   mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
   mount_target=${mount_dev: -3:1}
 
-  as_root pacstrap "${mount_point}" ${KERNEL} ${BOOTLOADER} ${BASE_PACKAGES} ${EXTRAPACKAGES} || exit_with_error 1 "Base install failed. Please check output."
+  as_root pacstrap "${mount_point}" ${KERNEL} ${BOOTLOADER} ${BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file} || exit_with_error 1 "Base install failed. Please check output."
 
   mount_image.sh umount ${mount_target} || warn "Unmount failed, please check"
   rmdir "${mount_point}"
