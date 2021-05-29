@@ -66,15 +66,15 @@ Generate an Cloud Template Image based on Arch Linux, using a profile
 	applied over a base install of Arch Linux.
     
 	==> FILES:
-		template.rc  - index file with configuration and metadata. see
+		template.rc  - Index file with configuration and metadata. see
         man 5 template_rc for more information
 	
-		addedpacks   - list of system packages to install with pacman.
+		addedpacks   - List of system packages to install with pacman.
         This is in addition to packages listed in template.rc. one
         package per line, # is comment character. For large curated list
         of system packages.
         
-		rootoverlay/ - directory with a root overlay. This gets applied
+		rootoverlay/ - Directory with a root overlay. This gets applied
         on top of base install. Will overwrite any file that exists.
         
 EOF
