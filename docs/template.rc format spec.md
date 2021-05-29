@@ -18,9 +18,9 @@ own file type.
 
 MAGIC NUMBER
 ------------
-The first bytes 17 bytes of this type of file will be:
+The first bytes 24 bytes of this type of file will be:
 ```
-#@TEMPLATEPROFILE
+#@CLOUD-TEMPLATE-PROFILE
 ```
 
 FORMAT
