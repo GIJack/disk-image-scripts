@@ -150,9 +150,13 @@ config_initcpio() {
 
 config_misc() {
   touch /etc/machine-id
+  # Use timezone module to set Timezone from config
   cat > "/etc/cloud/cloud.cfg.d/10_timezone.conf" << EOF
 cloud_config_modules:
  - timezone
+
+user-data:
+  timezone: "$TIMEZONE"
 EOF
 }
 
