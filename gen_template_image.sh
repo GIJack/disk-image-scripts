@@ -17,6 +17,7 @@ IMGSIZE=20480 # 20GB
 BASE_PACKAGES="base cloud-init cloud-utils openssh mkinitcpio"
 SCRIPT_BASE_DIR="/usr/share/disk-image-scripts"
 COMPRESS_IMAGE="N"
+TIMEZONE="UTC"
 # /Defaults #
 
 BOLD="$(tput bold)"
@@ -291,6 +292,7 @@ BOOTLOADER="${BOOTLOADER}"
 SYSTEMSERVICES="${SYSTEMSERVICES}"
 EXTRAPACKAGES="${EXTRAPACKAGES}"
 EXTRAINTMODULES="${EXTRAINITMODULES}"
+TIMEZONE="${TIMEZONE}"
 EOF
 
   ## Start the work

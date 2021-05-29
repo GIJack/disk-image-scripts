@@ -34,6 +34,10 @@ AUTHOR_GPG_SIG="" # Must match AUTHOR_EMAIL
 # shrinkwrap to the smallest possible size
 #IMGSIZE=20480 # 20GB
 
+#Posix Timezone. Images created with this template will use this timezone. UTC
+# is the default. see timedatectl list-timezones for valid entries
+TIMEZONE="UTC"
+
 # Added for future compatibility. Does nothing, and EXT4 will always be used
 FILESYSTEM="ext4"
 

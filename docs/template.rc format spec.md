@@ -99,7 +99,12 @@ configuration:
 IMGSIZE			Size in Megabytes of initial system install. This needs
 			to be big enough to accomidate base system install.
 			However, the final image will be shrunk to smallest size
-			before export.
+			before export. Default 20 GB
+
+TIMEZONE		Posix Timezone. Images created with this template will
+			use this timezone. Default: "UTC" or Universal
+			Cordinated Time.
+			see "timedatectl list-timezones" for valid entries
 
 FILESYSTEM		For future compatibility. Only EXT4 is supported and
 			only EXT4 will be used
