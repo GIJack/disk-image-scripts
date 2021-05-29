@@ -1,0 +1,40 @@
+.TH GEN_CLOUD_TEMPLATE
+.SH NAME
+.B gen_cloud_image \-
+Generate an Cloud Template Image based on Arch Linux, using a profile.
+.SH SYNOPSIS
+.B gen_cloud_image \fI[command]\fR \fI<argument>\fR
+
+.SH COMMANDS
+\fBhelp\fR				Print a help message and exit
+
+\fBinit-template\fR		Generate blank profile. rootoverlay/ directory
+and default template.rc. If no argument is given, \$PWD is used. Otherwise
+argument is directory path.
+
+\fBinit-image\fR		Generate an install of Arch in an image in a
+file named 'base-install.img'. Takes an optional argument, a directory path. If
+none is specified then \$PWD is used. This image needs to be in profile path
+
+\fBupdate-image\fR		Update the packages of of Arch Image. Runs
+pacman -Syu.
+
+\fBimage-shell\fR		Open a shell on the Arch Image. NOTE:
+rootoverlay is not applied. commands that require these files won't work.
+
+\fBcompile-template\fR		Generates usable Cloud VM Template based on
+metadata, overlay. Filename will be based on metadata from template.rc
+
+.SH FILES
+\fBtemplate.rc\fR		Index file with configuration and metadata.
+See \fIman 5 template_rc\fR for more information
+
+\fBaddedpacks\fR		List of system packages to install with pacman.
+This is in addition to packages listed in template.rc. one package per line, #
+is comment character. For large curated list of system packages.
+
+\fBrootoverlay/\fR		Directory with a root overlay. This gets applied
+on top of base install. Will overwrite any file that exists.
+
+.SH SEE ALSO
+\fItemplate_rc(5)\fR \fIinit_image(1)\fR \fImount_image(1)\fR \fIshrinkwrap(1)\fR
