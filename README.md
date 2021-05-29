@@ -26,7 +26,7 @@ filesystem
 
 mount_image.sh - mount or unmount a previously made image
 
-gen_template_image.sh - generate a cloud template images based on a profile.
+gen_cloud_template.sh - generate a cloud template images based on a profile.
 see --help for more information
 
 shrinkwrap_image.sh - reduce an .img to its smallest possible size. Especially

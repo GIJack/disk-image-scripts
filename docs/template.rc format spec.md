@@ -3,10 +3,10 @@ template.rc file SPECIFICATION
 
 VERSION: 0.x - provisional/experimental
 
-This specification will describe template.rc as used by gen_template_image.rc
+This specification will describe template.rc as used by gen_cloud_template.sh
 This information shall also be accessible in man 5 template_rc
 
-template.rc is the metadata file for gen_template_image.sh. This is what
+template.rc is the metadata file for gen_cloud_template.sh. This is what
 describes the template image that will be generated. There are two sections:
 System metadata, used for keeping track of the project and as a label, and
 system, which overrides /etc/cloud/init.arch.local is used in the generation

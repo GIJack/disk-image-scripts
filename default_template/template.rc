@@ -1,6 +1,6 @@
-#@TEMPLATEPROFILE
+#@CLOUD-TEMPLATE-PROFILE
 
-# Metadata and defaults file for Disk-Image-Script's gen_template.image.sh.
+# Metadata and defaults file for Disk-Image-Script's gen_cloud_template.sh
 # This will overwrite anything in init.arch.local.
 OSTYPE="arch"
 FILEFORMAT=0
