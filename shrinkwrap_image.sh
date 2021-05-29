@@ -148,7 +148,7 @@ _resize_part() {
   #fi
   
   # sfdisk parted replacement
-  echo ",${fs_size}" | as_root sfdisk -N ${PART_N} ${LOOP_DEV} # > /dev/null
+  echo ",${fs_size}" | as_root sfdisk -N ${PART_N} ${LOOP_DEV}  > /dev/null
   if [ ${?} -ne 0 ];then
     local_exit+=1
     warn "sfdisk fails, check output"
