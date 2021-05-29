@@ -17,7 +17,7 @@ local_config="/init.arch.conf"
 # packages that need to be installed
 system_packages="base cloud-init cloud-utils openssh mkinitcpio"
 # systemd services that need to be enabled
-system_services="systemd-networkd sshd cloud-init-local cloud-init cloud-config cloud-final"
+system_services="systemd-networkd systemd-resolved sshd cloud-init-local cloud-init cloud-config cloud-final"
 # kernel modules that get added to /etc/mkinitcpio
 initcpio_modules="virtio virtio_pci virtio_blk virtio_net virtio_ring"
 # block device parition with root fs, minus the /dev/ part
@@ -148,6 +148,14 @@ config_initcpio() {
   return ${exit_n}
 }
 
+config_misc() {
+  touch /etc/machine-id
+  cat > "/etc/cloud/cloud.cfg.d/10_timezone.conf" << EOF
+cloud_config_modules:
+ - timezone
+EOF
+}
+
 main() {
   local -i exit_code=0
   [[ $1 == "help" || $1 == "--help" ]] && help_and_exit
@@ -158,8 +166,9 @@ main() {
     warn "${local_config} not found!, default is in /usr/share/disk-image-scripts/init.arch.config"
   fi
   #install_packages || exit_with_error 1 "Could not install necessary packages needed for script to run. Please check install"
-  enable_services  || exit_code+=1 ; warn "systemctl enabled failed"
-  config_initcpio  || exit_code+=1 ; warn "initcpio config failed"
+  enable_services  || exit_code+=1 ; warn "Systemctl enabled failed"
+  config_initcpio  || exit_code+=1 ; warn "Initcpio config failed"
+  config_misc      || exit_code+=1 ; warn "Misc config failed"
   
   case ${BOOTLOADER} in
    syslinux)
