@@ -1,7 +1,7 @@
 template.rc file SPECIFICATION
 ==============================
 
-VERSION: 0.x - provisional/experimental
+VERSION: 0.9 - provisional/experimental
 
 This specification will describe template.rc as used by gen_cloud_template.sh
 This information shall also be accessible in man 5 template_rc
@@ -28,7 +28,7 @@ FORMAT
 The format of this file uses key=value pairs for data, with all the KEYS in
 UPPERCASE. the comment character is #, of which all data is discarded afterwards
 on the line. All text variables shall be quoted with either single\' or double
-\" quotes. Numerical values shall all be intergers, and unquoted. formatting
+\" quotes. Numerical values shall all be intergers, and unquoted. Formatting
 shall otherwise be compatible with variables for GNU Bash.
 
 METADATA
@@ -39,7 +39,8 @@ OSTYPE			Name of Linux Distro. For use with cloud-init, and must
 			use same format. As of now only "arch" is supported
 
 FILEFORMAT		Interger with what version of this spec this is using.
-			Relevant to OSTYPE.
+Known Versions:
+
 Ver	Description
 0	pre-release experimental
 
@@ -69,14 +70,13 @@ PROJECT_DESCRIPTION	Longwinded description of what this project is, what
 
 --> AUTHOR (OPTIONAL)
 
-AUTHOR_NAME		Name/handle/nick/alias of the person who wrote this.
+AUTHOR_NAME		Name/handle/nick/alias of the Author
 
-AUTHOR_EMAIL		Email address of the author.
+AUTHOR_EMAIL		Email address of the Author
 
-AUTHOR_GPG_SIG		Signature of Author's GPG key. For used in contacting
-			author. If you specify a key here, then AUTHOR_EMAIL
-			needs to be filled in, and name on the key needs to
-			match.
+AUTHOR_GPG_SIG		Signature of Author's GPG key. If you specify a key here,
+			then AUTHOR_EMAIL needs to be non-empty, and AUTHOR_NAME
+			and AUTHOR EMAIL must match GPG Key.
 			
 AUTHOR_CONTACT		Additional contact information for the author. This is a
 			space seperated list of PROTOCOL:ADDRESS formatted
