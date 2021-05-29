@@ -65,7 +65,7 @@ Generate an Cloud Template Image based on Arch Linux, using a profile
 	Set directory and file structure with metadata and a root overlay
 	applied over a base install of Arch Linux.
     
-	==> FILES:
+	==> TEMPLATE FILES:
 		template.rc  - Index file with configuration and metadata. see
         man 5 template_rc for more information
 	
