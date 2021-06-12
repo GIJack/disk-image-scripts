@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 _list_parts(){
   mount_image.sh list | sed "1d" | cut -d " " -f 1
