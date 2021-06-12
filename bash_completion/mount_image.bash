@@ -1,8 +1,10 @@
 #!/usr/bin/bash
 
+_list_parts(){
+  mount_image.sh list | sed "1d" | cut -d " " -f 1
+}
 _mount_image_completion() {
-  local cur prev
-  local output=""
+  local cur prev output umount_list
   cur=${COMP_WORDS[COMP_CWORD]}
   prev=${COMP_WORDS[COMP_CWORD-1]}
 
@@ -17,7 +19,8 @@ _mount_image_completion() {
           COMPREPLY=($(compgen -W "${output[*]}" -- ${cur}))
           ;;
         umount)
-          COMPREPLY=($(compgen -W "N" -- ${cur} ))
+          umount_list="$(_list_parts)"
+          COMPREPLY=($(compgen -W "${umount_list}" -- ${cur} ))
           ;;
       esac
       ;;
