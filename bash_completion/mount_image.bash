@@ -10,7 +10,7 @@ _mount_image_completion() {
 
   case ${COMP_CWORD} in
     1)
-      COMPREPLY=( $(compgen -W "mount umount list" -- ${cur}) )
+      COMPREPLY=($(compgen -W "mount umount list" -- ${cur}))
       ;;
     2)
       case ${prev} in
@@ -20,7 +20,7 @@ _mount_image_completion() {
           ;;
         umount)
           umount_list="$(_list_parts)"
-          COMPREPLY=($(compgen -W "${umount_list}" -- ${cur} ))
+          COMPREPLY=($(compgen -W "${umount_list}" -- ${cur}))
           ;;
       esac
       ;;
