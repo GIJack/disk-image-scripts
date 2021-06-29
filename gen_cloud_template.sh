@@ -327,6 +327,7 @@ EOF
   fi
   as_root cp "${SCRIPT_BASE_DIR}/init.arch.sh" "${mount_point}" || warn "Could not copy initialization script to chroot!"
   as_root cp "${TARGET}/init.arch.conf" "${mount_point}" || exit_with_error 1 "Could not copy initialization config to chroot!"
+  [ -f "${TARGET}/init.arch.local.sh" ] as_root cp "${TARGET}/init.arch.local.sh" "${mount_point}" || exit_with_error 1 "Could not copy local initializtion script to chroot!"
 
   # initialize with script
   submsg "Running Initalization Script..."
@@ -336,9 +337,11 @@ EOF
   submsg "Cleanup"
   as_root rm -f "${mount_point}/init.arch.sh"
   as_root rm -f "${mount_point}/init.arch.conf"
+  as_root rm -f "${mount_point}/init.arch.local.sh"
   mount_image.sh umount ${mount_target} || warn "Unmount failed, please check"
   rmdir "${mount_point}" || warn "Could not delete temporary mountpoint directory"
   rm -f "${TARGET}/init.arch.conf"
+
 
   # Shrinkwrap
   

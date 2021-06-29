@@ -154,6 +154,11 @@ config_misc() {
   ln -sf "/usr/share/zoneinfo/${TIMEZONE}" /etc/localtime
 }
 
+run_user_script(){
+  bash /init.arch.local.sh
+  return ${?}
+}
+
 main() {
   local -i exit_code=0
   [[ $1 == "help" || $1 == "--help" ]] && help_and_exit
@@ -167,6 +172,7 @@ main() {
   enable_services  || exit_code+=1 ; warn "Systemctl enabled failed"
   config_initcpio  || exit_code+=1 ; warn "Initcpio config failed"
   config_misc      || exit_code+=1 ; warn "Misc config failed"
+  run_user_script  || exit_code+=1 ; warn "Local user script fails"
   
   case ${BOOTLOADER} in
    syslinux)
