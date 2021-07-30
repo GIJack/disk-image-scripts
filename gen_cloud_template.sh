@@ -73,10 +73,14 @@ Generate an Cloud Template Image based on Arch Linux, using a profile
         This is in addition to packages listed in template.rc. one
         package per line, # is comment character. For large curated list
         of system packages.
+
+        	init_image.sh - initialization script that runs with the 
+        compile-template command on the output image. This is for anything that
+        can't neatly be handled by a file or package,
         
 		rootoverlay/ - Directory with a root overlay. This gets applied
         on top of base install. Will overwrite any file that exists.
-        
+
 EOF
   exit 4
 }
