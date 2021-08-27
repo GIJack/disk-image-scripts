@@ -3,9 +3,11 @@
 .B mount_image \-
 Mount and dismount raw disk images(.img)
 .SH SYNOPSIS
-.B mount_image
-.IR <command>
-.IR [file_name.img "|" N]
+.SY mount_image
+.OP command
+.OP file_name.img|N
+.YS
+
 .SH DESCRIPTION
 Mount and dismount raw disk images. assumes a single parition in the
 file. n is the number of the loop device, as shown in list. An image
@@ -16,23 +18,24 @@ script
 .SH COMMANDS
 .TP
 .BR mount
-Mount \fIfile_name\fR on ~/mnt
+	Mount \fIfile_name\fR on ~/mnt
 .TP
 mount_image mount \fI<file_name.img>\fR
 .TP
 .BR umount
-Dismount image in slot \fIN\fR
+	Dismount image in slot \fIN\fR
 .TP
 mount_image umount \fIN\fR
 .TP
 .BR list
-List currently attached images. Will give N to use with \fBumount\fR
+	List currently attached images. Will give N to use with umount
 .TP
 mount_image list
 
 .SH OPTIONS
-.BR \-m ",	--mount-point"
-Specificy directory to use as mountpoint, default is $HOME/mnt
+.B \-m,\-\-mount-point
+	Specificy directory to use as mountpoint, default is $HOME/mnt
+
 
 .SH SEE ALSO
-\fIinit_image\fR(1) \fIshrinkwrap_image\fR(1)
+.I init_image(1) shrinkwrap_image(1)

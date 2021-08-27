@@ -3,7 +3,12 @@
 .B shrinkwrap_image \-
 Shrink a .img(Disk Image) to its smallest possible size, for export.
 .SH SYNOPSIS
-.B shrink_wrap \fIfile_name.img\fR
+.SY shrink_wrap
+.OP \-d,\-\-no-defrag
+.OP \-z,\-\-gzip
+.OP \-g,\-\-gz-options gzip_options
+.OP file_name.img
+.YS
 
 .SH DESCRIPTION
 "Shrink Wrap" a system image for export. Reduce an disk image file to
@@ -23,8 +28,8 @@ Skip defrag stage
 .BR \-z ",	--gzip"
 Compress final image with gzip
 .TP
-.BR \-g ",	--gz-options"
+.BR \-g ",	--gz-options GZIP_OPTIONS"
 Options to pass on to gzip, see \fIgzip\fR(1) for more info
 
 .SH SEE ALSO
-\fImount_image\fR(1) \fIinit_image\fR(1) \fIgzip\fR(1)
+.I mount_image(1) init_image(1) gzip(1)

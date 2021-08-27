@@ -2,8 +2,12 @@
 .SH NAME
 .B gen_cloud_image \-
 Generate an Cloud Template Image based on Arch Linux, using a profile.
+
 .SH SYNOPSIS
-.B gen_cloud_image \fI[command]\fR \fI<argument>\fR
+.SY gen_cloud_image
+.OP command
+.OP <argument>
+.YS
 
 .SH COMMANDS
 \fBhelp\fR				Print a help message and exit
@@ -37,4 +41,4 @@ is comment character. For large curated list of system packages.
 on top of base install. Will overwrite any file that exists.
 
 .SH SEE ALSO
-\fItemplate_rc(5)\fR \fIinit_image(1)\fR \fImount_image(1)\fR \fIshrinkwrap(1)\fR
+.I template_rc(5) init_image(1) mount_image(1) shrinkwrap(1)
