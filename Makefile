@@ -21,7 +21,6 @@ remove:
 	rm "$(DESTDIR)/$(PREFIX)/bin/init_image.sh"
 	rm "$(DESTDIR)/$(PREFIX)/bin/gen_cloud_template.sh"
 	rm "$(DESTDIR)/usr/share/disk-image-scripts/init.arch.sh"
-	rm "$(DESTDIR)/usr/share/disk-image-scripts/init.arch.conf"
 	rm "$(DESTDIR)/$(PREFIX)/share/man/man1/init_image.1"
 	rm "$(DESTDIR)/$(PREFIX)/share/man/man1/shrink_wrap.1"
 	rm "$(DESTDIR)/$(PREFIX)/share/man/man1/mount_image.1"
