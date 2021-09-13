@@ -21,15 +21,15 @@ machine systems.
 
 Scripts:
 --------
-init_image.sh - create a blank image file, formated with a single parition and a
+init\_image.sh - create a blank image file, formated with a single parition and a
 filesystem
 
-mount_image.sh - mount or unmount a previously made image
+mount\_image.sh - mount or unmount a previously made image
 
-gen_cloud_template.sh - generate a cloud template images based on a profile.
+gen\_cloud\_template.sh - generate a cloud template images based on a profile.
 see --help for more information
 
-shrinkwrap_image.sh - reduce an .img to its smallest possible size. Especially
+shrinkwrap\_image.sh - reduce an .img to its smallest possible size. Especially
 for export.
 
 Instalation
