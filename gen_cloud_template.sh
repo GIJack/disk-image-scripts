@@ -5,7 +5,7 @@
 # Linux systems from Arch Linux. We hope to rectify that in the future.
 # At least run on any GNU(assume coreutils) system.
 #
-# Exit codes 0-Success, 1-command failure, 2-invalid input, 4-help message
+# Exit codes 0-Success, 1-operational error, 2-invalid input, 4-help message
 
 # Defaults #
 
@@ -14,11 +14,15 @@ ROOT_METHOD="sudo"
 BASE_IMAGE="base-install.img"
 TEMPLATE_INDEX="template.rc"
 IMGSIZE=20480 # 20GB
-BASE_PACKAGES="base cloud-init cloud-guest-utils openssh mkinitcpio"
+ARCH_BASE_PACKAGES="base cloud-init cloud-guest-utils openssh mkinitcpio"
+DEB_BASE_PACKAGES="cloud-init cloud-guest-utils openssh-server initramfs-tools"
 SCRIPT_BASE_DIR="/usr/share/disk-image-scripts"
 PACKAGE_LIST_FILE="addedpacks"
 COMPRESS_IMAGE="Y"
 TIMEZONE="UTC"
+VALID_OS_TYPES="arch debian"
+DEBMIRROR="http://deb.debian.org/debian/"
+DEBDISTRO="stable"
 # /Defaults #
 
 BOLD="$(tput bold)"
@@ -154,6 +158,9 @@ parse_environment(){
     # write sanitized values to temp file
     echo "${key}=${value}" >> ${safe_config}
   done
+  
+  # Proccess defaults. If there is no CPU archecture set, then use whatever local machine is using
+  [[ ${PROJECTARCH} == "any"  || -z ${PROJECTARCH} ]] && PROJECTARCH=$(uname -m)
 
   #Now, we can import the cleaned config and then delete it.
   source ${safe_config}
@@ -184,7 +191,10 @@ is_template(){
   # Metadata
   [[ -z ${PROJECTNAME} || -z ${PROJECTVER} || -z ${PROJECTARCH} ]] && return 1
   # System
-  [[ -z ${KERNEL} || -z ${BOOTLOADER} ]] && return 1
+  [[ -z ${KERNEL} || -z ${BOOTLOADER} || -z ${OSTYPE} ]] && return 1
+  
+  # check if OSTYPE= is supported
+  [[ "${VALID_OS_TYPES}" = *${OSTYPE}* ]] || return 1
   
   # If nothing fails, check passes
   return 0
@@ -215,7 +225,6 @@ _init_image() {
   [ -f ${PACKAGE_LIST_FILE} ] && packages_from_file=$( parse_package_file "${TARGET}/${PACKAGE_LIST_FILE}" )
 
   message "Performing Initial Install"
-  parse_environment "${TARGET}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
 
   # If install exists, delete it first
   [ -f "${TARGET}/${BASE_IMAGE}" ] && rm -f "${TARGET}/${BASE_IMAGE}"
@@ -225,15 +234,33 @@ _init_image() {
   mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
   mount_target=${mount_dev: -3:1}
 
-  as_root pacstrap "${mount_point}" ${KERNEL} ${BOOTLOADER} ${BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file} || exit_with_error 1 "Base install failed. Please check output."
-
+  case ${OSARCH} in
+   arch)
+    as_root pacstrap "${mount_point}" ${KERNEL} ${BOOTLOADER} ${ARCH_BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file} || exit_with_error 1 "Base Arch Linux install failed. Please check output."
+    ;;
+   debian)
+    # debootstrap needs a comma seperated list of packages
+    local deb_packages=$( tr ' ' ',' <<< "${KERNEL} ${BOOTLOADER} ${DEB_BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file}" )
+    as_root debootstrap --arch ${PROJECTARCH} "${DEBDISTRO}" "${mount_point}" --include="${deb_packages}" || exit_with_error 1 "Base Debian install failed. Please check output."
+    ;;
+   *)
+    exit_with_error 2 "Unsupported OS Arch type: ${OSARCH}"
+  esac
   mount_image.sh umount ${mount_target} || warn "Unmount failed, please check"
   rmdir "${mount_point}"
 }
 
 _update_image(){
   # Patch the base install, using pacman.
-  _image_shell "pacman -Syu"
+  case ${OSARCH} in
+   arch)
+    _image_shell "pacman -Syu"
+    ;;
+   debian)
+    _image_shell "apt update && apt upgrade"
+   *)
+    exit_with_error 2 "Unsupported OS Arch type: ${OSARCH}"
+  esac
 }
 
 _image_shell(){
@@ -285,7 +312,7 @@ _compile_template(){
     PROJECT_SLUG="$(tr -cd "[:alnum:]" <<< $PROJECT_SLUG)"
     outfile_name="${PROJECT_SLUG}_"
     # Add OS archecture
-    [[ ! -z ${PROJECTARCH} && ${PROJECTARCH} != "any" ]] && outfile_name+="${PROJECTARCH}_"
+    outfile_name+="${PROJECTARCH}_"
     # Project Version
     if [[ ! -z ${PROJECTVER} && ${PROJECTVER} -ne 0 && ${PROJECTVER} -eq ${PROJECTVER} ]];then
       outfile_name+="${PROJECTVER}_"
@@ -302,8 +329,9 @@ _compile_template(){
   fi
 
   ## Generate final init.arch.local
-  touch "${TARGET}/init.arch.conf" || exit_with_error 1 "Could not write to target, please check permissions."
-  cat > "${TARGET}/init.arch.conf" << EOF
+  touch "${TARGET}/init.conf" || exit_with_error 1 "Could not write to target, please check permissions."
+  cat > "${TARGET}/init.conf" << EOF
+OSTYPE=${OSTYPE}
 KERNEL="${KERNEL}"
 BOOTLOADER="${BOOTLOADER}"
 SYSTEMSERVICES="${SYSTEMSERVICES}"
@@ -329,9 +357,9 @@ EOF
   if [ -d "${TARGET}"/rootoverlay/ ];then
     as_root cp -r "${TARGET}"/rootoverlay/* "${mount_point}/" || warn "Could not copy root overlay. If rootoverlay/ is empty you can ignore this."
   fi
-  as_root cp "${SCRIPT_BASE_DIR}/init.arch.sh" "${mount_point}" || warn "Could not copy initialization script to chroot!"
-  as_root cp "${TARGET}/init.arch.conf" "${mount_point}" || exit_with_error 1 "Could not copy initialization config to chroot!"
-  [ -f "${TARGET}/init.arch.local.sh" ] && as_root cp "${TARGET}/init.arch.local.sh" "${mount_point}" || exit_with_error 1 "Could not copy local initializtion script to chroot!"
+  as_root cp "${SCRIPT_BASE_DIR}/init.${OSTYPE}.sh" "${mount_point}" || warn "Could not copy initialization script to chroot!"
+  as_root cp "${TARGET}/init.conf" "${mount_point}" || exit_with_error 1 "Could not copy initialization config to chroot!"
+  [ -f "${TARGET}/init.${OSTYPE}.local.sh" ] && as_root cp "${TARGET}/init.${OSTYPE}.local.sh" "${mount_point}" || warn "Could not copy local initializtion script to chroot!"
 
   # initialize with script
   submsg "Running Initalization Script..."
@@ -339,12 +367,12 @@ EOF
   
   # Cleanup
   submsg "Cleanup"
-  as_root rm -f "${mount_point}/init.arch.sh"
-  as_root rm -f "${mount_point}/init.arch.conf"
-  as_root rm -f "${mount_point}/init.arch.local.sh"
+  as_root rm -f "${mount_point}/init.${OSTYPE}.sh"
+  as_root rm -f "${mount_point}/init.conf"
+  as_root rm -f "${mount_point}/init.${OSTYPE}.local.sh"
   mount_image.sh umount ${mount_target} || warn "Unmount failed, please check"
   rmdir "${mount_point}" || warn "Could not delete temporary mountpoint directory"
-  rm -f "${TARGET}/init.arch.conf"
+  rm -f "${TARGET}/init.conf"
 
 
   # Shrinkwrap
@@ -357,12 +385,16 @@ EOF
        shrinkwrap_image.sh "${TARGET}/${outfile_name}" || warn "Shrinkwrap threw a code"
     fi
     
-    submsg "Re-Initializing Syslinux"
+    submsg "Re-Initializing Bootloader"
     mount_point="$(mktemp -d)"
     mount_image.sh mount -m "${mount_point}" "${TARGET}/${outfile_name}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
     mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
     mount_target=${mount_dev: -3:1}
-    as_root arch-chroot "${mount_point}" "syslinux-install_update -i -a -m" || warn "syslinux re-initialization failed"
+    case ${BOOTLOADER} in
+     *syslinux*)
+      as_root arch-chroot "${mount_point}" "syslinux-install_update -i -a -m" || warn "syslinux re-initialization failed"
+      ;;
+    esac
 
     #Cleanup again
     mount_image.sh umount ${mount_target} || warn "Unmount failed, please check"
@@ -392,18 +424,22 @@ main() {
     ;;
    init-image)
     is_template "${TARGET}" || exit_with_error 2 "${TARGET} is not a valid profile, quitting"
+    parse_environment "${TARGET}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
     _init_image
     ;;
    update-image)
     is_template "${TARGET}" || exit_with_error 2 "${TARGET} is not a valid profile, quitting"
+    parse_environment "${TARGET}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
     _update_image
     ;;
    image-shell)
     is_template "${TARGET}" || exit_with_error 2 "${TARGET} is not a valid profile, quitting"
+    parse_environment "${TARGET}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
     _image_shell "${@:3}"
     ;;
    compile-template)
     is_template "${TARGET}" || exit_with_error 2 "${TARGET} is not a valid profile, quitting"
+    parse_environment "${TARGET}/${TEMPLATE_INDEX}" || exit_with_error 1 "Could not parse ${TEMPLATE_INDEX}, fail"
     _compile_template
     ;;
    *)

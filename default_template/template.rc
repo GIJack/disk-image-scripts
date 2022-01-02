@@ -2,11 +2,17 @@
 
 # Metadata and defaults file for Disk-Image-Script's gen_cloud_template.sh
 # This will overwrite anything in init.arch.local.
+# supported values are "arch" and "debian"
 OSTYPE="arch"
+
 FILEFORMAT=0
 COMPRESS_IMAGE="Y"
 COMPRESS_OPTS=""
 
+## Debian Specific Options
+# If OSTYPE is "debian", this can be specified
+#DEBMIRROR="http://deb.debian.org/debian/"
+#DEBDISTRO="stable"
 ### Project Metadata ###
 
 # Name of project, version, and the OS Archecture. Arch follows same standards

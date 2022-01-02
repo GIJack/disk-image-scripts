@@ -38,7 +38,15 @@ shall otherwise be compatible with variables for GNU Bash.
 The following keys are recognized as metadata:
 
 \fBOSTYPE\fR			Name of Linux Distro. For use with cloud-init,
-and must use same format. As of now only \fIarch\fR is supported
+and must use same format.
+
+Supported Distributions:
+.EX
+	Value	Description
+	-------------------
+	arch	Arch Linux	https://archlinux.org
+	debian	Debian-based	This can work with debian, Ubuntu or anything
+.EE
 
 \fBFILEFORMAT\fR		Interger with what version of this spec this is
 using. Known Versions:
@@ -54,6 +62,14 @@ with gzip. \fIY\fR compresses, everything else is a no.
 
 \fBCOMPRESS_OPTS\fR		Command line parameters to pass to gzip for use
 with COMPRESS_IMAGE. defaults to none
+
+.SS DEBIAN OPTIONS
+
+\fBDEBMIRROR\fR			URL for Debian Mirror. Used if set and OSTYPE
+is "debian". Default is http://deb.debian.org/debian/
+
+\fBDEBDISTRO\fR			Distro name for debootstrap. Works only with
+OSTYPE "debian". default: "stable"
 
 .BR
 

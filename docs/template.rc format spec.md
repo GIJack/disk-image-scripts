@@ -6,7 +6,7 @@ VERSION: 0.9 - provisional/experimental
 This specification will describe template.rc as used by gen_cloud_template.sh
 This information shall also be accessible in man 5 template_rc
 
-template.rc is the metadata file for gen_cloud_template.sh. This is what
+template.rc is the metadata file for gen\_cloud\_template.sh. This is what
 describes the template image that will be generated. There are two sections:
 System metadata, used for keeping track of the project and as a label, and
 system, which overrides /etc/cloud/init.arch.local is used in the generation
@@ -36,7 +36,13 @@ METADATA
 The following keys are recognized as metadata:
 
 OSTYPE			Name of Linux Distro. For use with cloud-init, and must
-			use same format. As of now only "arch" is supported
+			use same format.
+			
+Supported OSs:
+	Value		Description
+	---------------------------
+	arch		Arch Linux	 - https://archlinux.org
+	debian		Debian GNU/Linux - https://debian.org
 
 FILEFORMAT		Interger with what version of this spec this is using.
 Known Versions:
@@ -49,6 +55,13 @@ COMPRESS_IMAGE		Boolean. If we want to compress final output with gzip.
 			
 COMPRESS_OPTS		Command line parameters to pass to gzip for use with
 			COMPRESS_IMAGE. defaults to none
+
+--> Debian Options
+			
+DEBMIRROR		URL of Debian repository of OSTYPE is set to Debian.
+			Optional. Default: "http://deb.debian.org/debian/"
+
+DEBDISTRO		Distro name. Use with debootstrap. Default: "stable"
 
 --> PROJECT
 
