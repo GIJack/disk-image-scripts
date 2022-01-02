@@ -380,7 +380,7 @@ EOF
   if [ ${COMPRESSIMAGE} == "Y" ];then
     submsg "Shrinkwrapping..."
     if [ -z "${COMPRESS_OPTS}" ];then
-       shrinkwrap_image.sh  "${TARGET}/${outfile_name}" || warn "Shrinkwrap threw a code"
+       shrinkwrap_image.sh -z "${TARGET}/${outfile_name}" || warn "Shrinkwrap threw a code"
       else
        shrinkwrap_image.sh "${TARGET}/${outfile_name}" || warn "Shrinkwrap threw a code"
     fi
