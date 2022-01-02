@@ -393,6 +393,8 @@ EOF
     case ${BOOTLOADER} in
      *syslinux*)
       as_root arch-chroot "${mount_point}" "syslinux-install_update -i -a -m" || warn "syslinux re-initialization failed"
+     *)
+      warn "Bootloader unsupported, skipping.."
       ;;
     esac
 
