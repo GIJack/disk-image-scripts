@@ -391,19 +391,19 @@ main() {
     _init_template
     ;;
    init-image)
-    is_template "${TARGET}" || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
+    is_template "${TARGET}" || exit_with_error 2 "${TARGET} is not a valid profile, quitting"
     _init_image
     ;;
    update-image)
-    is_template "${TARGET}" || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
+    is_template "${TARGET}" || exit_with_error 2 "${TARGET} is not a valid profile, quitting"
     _update_image
     ;;
    image-shell)
-    is_template "${TARGET}" || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
+    is_template "${TARGET}" || exit_with_error 2 "${TARGET} is not a valid profile, quitting"
     _image_shell "${@:3}"
     ;;
    compile-template)
-    is_template "${TARGET}" || exit_with_error 1 "${TARGET} is not a valid profile, quitting"
+    is_template "${TARGET}" || exit_with_error 2 "${TARGET} is not a valid profile, quitting"
     _compile_template
     ;;
    *)
