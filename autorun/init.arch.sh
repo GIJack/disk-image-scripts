@@ -149,12 +149,14 @@ config_initcpio() {
 }
 
 config_misc() {
+  submsg "Misc Config"
   touch /etc/machine-id
   # Use timezone module to set Timezone from config
   ln -sf "/usr/share/zoneinfo/${TIMEZONE}" /etc/localtime
 }
 
 run_user_script(){
+  subgmsg "Running Local Script"
   bash /init.arch.local.sh
   return ${?}
 }
