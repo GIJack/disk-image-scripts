@@ -16,6 +16,8 @@ TEMPLATE_INDEX="template.rc"
 IMGSIZE=20480 # 20GB
 ARCH_BASE_PACKAGES="base cloud-init cloud-guest-utils openssh mkinitcpio"
 DEB_BASE_PACKAGES="cloud-init cloud-guest-utils openssh-server initramfs-tools"
+BASE_SYSTEM_SERVICES="sshd cloud-init-local cloud-init cloud-config cloud-final"
+BASE_INITRAMDISK_MODULES="virtio virtio_pci virtio_blk virtio_net virtio_ring"
 SCRIPT_BASE_DIR="/usr/share/disk-image-scripts"
 PACKAGE_LIST_FILE="addedpacks"
 COMPRESS_IMAGE="Y"
@@ -334,9 +336,9 @@ _compile_template(){
 OSTYPE=${OSTYPE}
 KERNEL="${KERNEL}"
 BOOTLOADER="${BOOTLOADER}"
-SYSTEMSERVICES="${SYSTEMSERVICES}"
+SYSTEMSERVICES="${BASE_SYSTEM_SERVICES} ${SYSTEMSERVICES}"
 EXTRAPACKAGES="${EXTRAPACKAGES}"
-EXTRAINTMODULES="${EXTRAINITMODULES}"
+EXTRAINTMODULES="${BASE_INITRAMDISK_MODULES} ${EXTRAINITMODULES}"
 TIMEZONE="${TIMEZONE}"
 EOF
 
