@@ -48,7 +48,8 @@ TIMEZONE="UTC"
 FILESYSTEM="ext4"
 
 # Name of kernel package. Default is Long Term Support Kernel "linux-lts"
-KERNEL="linux-lts"
+KERNEL="linux-lts" # Arch Linux
+#KERNEL="linux-image" # Debian-based
 
 # As of now, only syslinux is supported. Added for future compatibility
 BOOTLOADER="syslinux"
