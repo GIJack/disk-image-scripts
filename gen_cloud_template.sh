@@ -391,7 +391,7 @@ EOF
   mount_target=${mount_dev: -3:1}
   case ${BOOTLOADER} in
    *syslinux*)
-    as_root arch-chroot "${mount_point}" "syslinux-install_update -i -a -m" || warn "syslinux re-initialization failed"
+    as_root arch-chroot "${mount_point}" "syslinux-install_update -a -m" || warn "syslinux re-initialization failed"
     ;;
    *)
     warn "Bootloader unsupported, skipping.."

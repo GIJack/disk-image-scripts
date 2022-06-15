@@ -115,19 +115,13 @@ parse_environment(){
   rm -f ${safe_config}
 }
 
-install_packages() {
-  submsg "Installing/Updated Base packages"
-  pacman --noconfirm -Su ${system_packages} ${BOOTLOADER} ${KERNEL} ${EXTRAPACKAGES}
-  return $?
-}
-
 install_syslinux() {
   submsg "Configuring Syslinux Bootloader"
   local -i exit_n=0
+  syslinux-install_update -i -a -m || exit_n+=1
   sed -i s/sda3/${root_part}/g /boot/syslinux/syslinux.cfg || exit_n+=1
   sed -i s/initramfs-linux/initramfs-${KERNEL}/g /boot/syslinux/syslinux.cfg || exit_n+=1
   sed -i s/vmlinuz-linux/vmlinuz-${KERNEL}/g /boot/syslinux/syslinux.cfg || exit_n+=1
-  syslinux-install_update -i -a -m || exit_n+=1
   return ${exit_n}
 }
 
@@ -139,7 +133,7 @@ enable_services() {
 
 config_initcpio() {
   local -i exit_n=0
-  submsg "Updating mkinicpio.conf"
+  submsg "Updating mkinitcpio"
   # add extra modules from local file
   initcpio_modules+=" "
   initcpio_modules+=${EXTRAINTMODULES}
@@ -172,22 +166,16 @@ main() {
   [[ $1 == "help" || $1 == "--help" ]] && help_and_exit
   message "Initalizing..."
   if [ -f "${local_config}" ];then
+    message "parsing ${local_config}"
     parse_environment "${local_config}"
    else
     warn "${local_config} not found!, default is in /usr/share/disk-image-scripts/default_template/init.conf"
   fi
-  #install_packages || exit_with_error 1 "Could not install necessary packages needed for script to run. Please check install"
-  local item_list="enable_services config_initcpio config_misc run_user_script"
-  for item in $item_list;do
-    ${item}
-    if [ $? -ne 0 ];then
-      exit_code+=1
-      warn "${item} failed"
-    fi
-  done
   
+  # install bootloader
   case ${BOOTLOADER} in
    syslinux)
+    install_syslinux
     if [ $? -ne 0 ];then
       exit_code+=1
       warn "Syslinux install failed"
@@ -198,7 +186,17 @@ main() {
     exit_code+=1
     ;;
   esac
-
+  
+  # Now run hooks, services
+  local item_list="enable_services config_initcpio config_misc run_user_script"
+  for item in $item_list;do
+    ${item}
+    if [ $? -ne 0 ];then
+      exit_code+=1
+      warn "${item} failed"
+    fi
+  done
+  
   message "Done!"
   [ $exit_code -ne 0 ] && exit_with_error 1 "${exit_code} Error(s), check above output"
 }
