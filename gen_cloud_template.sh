@@ -405,7 +405,7 @@ EOF
   # compressing final image
   if [ "${COMPRESSIMAGE}"  == "Y" ];then
     submsg "Compressing Image"
-    gzip ${COMPRESSOPTS} "${TARGET}/${outfile_name}"
+    gzip -f ${COMPRESSOPTS} "${TARGET}/${outfile_name}"
   fi
   submsg "Done!"
 }
