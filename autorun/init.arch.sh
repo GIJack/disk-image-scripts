@@ -13,7 +13,7 @@ BOOTLOADER="syslinux"
 
 ## BASE INSTALL ##
 # Hardcoded always install packages
-local_config="/init.arch.conf"
+local_config="/init.conf"
 # packages that need to be installed
 system_packages="base cloud-init cloud-utils openssh mkinitcpio"
 # systemd services that need to be enabled
@@ -174,7 +174,7 @@ main() {
   if [ -f "${local_config}" ];then
     parse_environment "${local_config}"
    else
-    warn "${local_config} not found!, default is in /usr/share/disk-image-scripts/init.arch.config"
+    warn "${local_config} not found!, default is in /usr/share/disk-image-scripts/default_template/init.conf"
   fi
   #install_packages || exit_with_error 1 "Could not install necessary packages needed for script to run. Please check install"
   local item_list="enable_services config_initcpio config_misc run_user_script"
