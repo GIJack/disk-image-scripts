@@ -156,8 +156,14 @@ config_misc() {
 }
 
 run_user_script(){
-  subgmsg "Running Local Script"
-  bash /init.arch.local.sh
+  submsg "Running Local Script"
+  local local_file="/init.arch.local.sh"
+  
+  if [ ! -f ${local_file} ];then
+    warn "No local init file: ${local_file}, skipping"
+    return 0
+  fi
+  bash ${local_file}
   return ${?}
 }
 
@@ -171,14 +177,21 @@ main() {
     warn "${local_config} not found!, default is in /usr/share/disk-image-scripts/init.arch.config"
   fi
   #install_packages || exit_with_error 1 "Could not install necessary packages needed for script to run. Please check install"
-  enable_services  || exit_code+=1 ; warn "Systemctl enabled failed"
-  config_initcpio  || exit_code+=1 ; warn "Initcpio config failed"
-  config_misc      || exit_code+=1 ; warn "Misc config failed"
-  run_user_script  || exit_code+=1 ; warn "Local user script fails"
+  local item_list="enable_services config_initcpio config_misc run_user_script"
+  for item in $item_list;do
+    ${item}
+    if [ $? -ne 0 ];then
+      exit_code+=1
+      warn "${item} failed"
+    fi
+  done
   
   case ${BOOTLOADER} in
    syslinux)
-    install_syslinux || exit_code+=1; warn "Syslinux install failed"
+    if [ $? -ne 0 ];then
+      exit_code+=1
+      warn "Syslinux install failed"
+    fi
     ;;
    *)
     warn "Bootloader ${BOOTLOADER} is unsupported, NO INSTALLED BOOTLOADER CONFIGURED!"
@@ -187,7 +200,7 @@ main() {
   esac
 
   message "Done!"
-  [ $exit_code -ne 0 ] && exit_with_error 1 "${exit_code} errrors, check above output"
+  [ $exit_code -ne 0 ] && exit_with_error 1 "${exit_code} Error(s), check above output"
 }
 
 main "${@}"
