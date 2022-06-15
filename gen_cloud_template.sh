@@ -260,8 +260,10 @@ _update_image(){
     ;;
    debian)
     _image_shell "apt update && apt upgrade"
+    ;;
    *)
     exit_with_error 2 "Unsupported OS Arch type: ${OSARCH}"
+    ;;
   esac
 }
 
@@ -356,13 +358,14 @@ EOF
 
   # copy template
   submsg "Copying Overlay..."
-  if [ -d "${TARGET}"/rootoverlay/ ];then
+  if [ -d "${TARGET}/rootoverlay/" ];then
     as_root cp -r "${TARGET}"/rootoverlay/* "${mount_point}/" || warn "Could not copy root overlay. If rootoverlay/ is empty you can ignore this."
   fi
   as_root cp "${SCRIPT_BASE_DIR}/init.${OSTYPE}.sh" "${mount_point}" || warn "Could not copy initialization script to chroot!"
   as_root cp "${TARGET}/init.conf" "${mount_point}" || exit_with_error 1 "Could not copy initialization config to chroot!"
-  [ -f "${TARGET}/init.${OSTYPE}.local.sh" ] && as_root cp "${TARGET}/init.${OSTYPE}.local.sh" "${mount_point}" || warn "Could not copy local initializtion script to chroot!"
-
+  if [ -f "${TARGET}/init.${OSTYPE}.local.sh" ];then
+    as_root cp "${TARGET}/init.${OSTYPE}.local.sh" "${mount_point}" || warn "Could not copy local initializtion script to chroot!"
+  fi
   # initialize with script
   submsg "Running Initalization Script..."
   as_root arch-chroot "${mount_point}" "bash /init.arch.sh" || warn "Initialization failed!"
@@ -378,33 +381,29 @@ EOF
 
 
   # Shrinkwrap
-  
-  if [ ${COMPRESSIMAGE} == "Y" ];then
-    submsg "Shrinkwrapping..."
-    if [ -z "${COMPRESS_OPTS}" ];then
-       shrinkwrap_image.sh -z "${TARGET}/${outfile_name}" || warn "Shrinkwrap threw a code"
-      else
-       shrinkwrap_image.sh "${TARGET}/${outfile_name}" || warn "Shrinkwrap threw a code"
-    fi
-    
-    submsg "Re-Initializing Bootloader"
-    mount_point="$(mktemp -d)"
-    mount_image.sh mount -m "${mount_point}" "${TARGET}/${outfile_name}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
-    mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
-    mount_target=${mount_dev: -3:1}
-    case ${BOOTLOADER} in
-     *syslinux*)
-      as_root arch-chroot "${mount_point}" "syslinux-install_update -i -a -m" || warn "syslinux re-initialization failed"
-     *)
-      warn "Bootloader unsupported, skipping.."
-      ;;
-    esac
+  submsg "Shrinkwrapping..."
+  shrinkwrap_image.sh "${TARGET}/${outfile_name}" || warn "Shrinkwrap threw a code"
+      
+  submsg "Re-Initializing Bootloader"
+  mount_point="$(mktemp -d)"
+  mount_image.sh mount -m "${mount_point}" "${TARGET}/${outfile_name}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
+  mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
+  mount_target=${mount_dev: -3:1}
+  case ${BOOTLOADER} in
+   *syslinux*)
+    as_root arch-chroot "${mount_point}" "syslinux-install_update -i -a -m" || warn "syslinux re-initialization failed"
+    ;;
+   *)
+    warn "Bootloader unsupported, skipping.."
+    ;;
+  esac
 
-    #Cleanup again
-    mount_image.sh umount ${mount_target} || warn "Unmount failed, please check"
-    rmdir "${mount_point}" || warn "Could not delete temporary mountpoint directory"
+  #Cleanup again
+  mount_image.sh umount ${mount_target} || warn "Unmount failed, please check"
+  rmdir "${mount_point}" || warn "Could not delete temporary mountpoint directory"
 
-    # compressing final image
+  # compressing final image
+  if [ "${COMPRESSIMAGE}"  == "Y" ];then
     submsg "Compressing Image"
     gzip ${COMPRESSOPTS} "${TARGET}/${outfile_name}"
   fi
