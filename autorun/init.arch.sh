@@ -56,7 +56,7 @@ message(){
 }
 
 submsg(){
-  echo "==> ${@}"
+  echo "[+] ${@}"
 }
 
 exit_with_error(){
