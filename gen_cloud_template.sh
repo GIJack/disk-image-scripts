@@ -315,7 +315,8 @@ _compile_template(){
     PROJECT_SLUG="${PROJECT_SLUG// /}"
     PROJECT_SLUG="$(tr -cd "[:alnum:]" <<< $PROJECT_SLUG)"
     outfile_name="${PROJECT_SLUG}_"
-    # Add OS archecture
+    # Add OS archecture. If Any or none is specified, get it from running kernel
+    [ ${PROJECTARCH} == "any" -o ${PROJECTARCH} == "" ] && PROJECTARCH=$(uname -m)
     outfile_name+="${PROJECTARCH}_"
     # Project Version
     if [[ ! -z ${PROJECTVER} && ${PROJECTVER} -ne 0 && ${PROJECTVER} -eq ${PROJECTVER} ]];then
