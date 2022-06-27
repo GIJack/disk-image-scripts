@@ -151,7 +151,7 @@ config_misc() {
 
 run_user_script(){
   submsg "Running Local Script"
-  local local_file="/init.arch.local.sh"
+  local local_file="/init.local.sh"
   
   if [ ! -f ${local_file} ];then
     warn "No local init file: ${local_file}, skipping"

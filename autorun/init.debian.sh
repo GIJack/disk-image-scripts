@@ -153,7 +153,7 @@ config_misc() {
 
 run_user_script(){
   submsg "Running User Script"
-  bash /init.debian.local.sh
+  bash /init.local.sh
   return ${?}
 }
 
