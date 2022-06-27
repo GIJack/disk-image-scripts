@@ -9,7 +9,7 @@ submsg(){
   echo "[+]	${@}"
 }
 warn(){
-  echo 1>&2 "Clout Image Init: WARN: ${@}"
+  echo 1>&2 "Cloud Image Init: WARN: ${@}"
 }
 
 
