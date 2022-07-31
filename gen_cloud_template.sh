@@ -236,7 +236,7 @@ _init_image() {
   mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
   mount_target=${mount_dev: -3:1}
 
-  case ${OSARCH} in
+  case ${OSTYPE} in
    arch)
     as_root pacstrap "${mount_point}" ${KERNEL} ${BOOTLOADER} ${ARCH_BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file} || exit_with_error 1 "Base Arch Linux install failed. Please check output."
     ;;
@@ -246,7 +246,7 @@ _init_image() {
     as_root debootstrap --arch ${PROJECTARCH} "${DEBDISTRO}" "${mount_point}" --include="${deb_packages}" || exit_with_error 1 "Base Debian install failed. Please check output."
     ;;
    *)
-    exit_with_error 2 "Unsupported OS Arch type: ${OSARCH}"
+    exit_with_error 2 "Unsupported OS type: ${OSTYPE}"
   esac
   mount_image.sh umount ${mount_target} || warn "Unmount failed, please check"
   rmdir "${mount_point}"
@@ -254,7 +254,7 @@ _init_image() {
 
 _update_image(){
   # Patch the base install, using pacman.
-  case ${OSARCH} in
+  case ${OSTYPE} in
    arch)
     _image_shell "pacman -Syu"
     ;;
@@ -262,7 +262,7 @@ _update_image(){
     _image_shell "apt update && apt upgrade"
     ;;
    *)
-    exit_with_error 2 "Unsupported OS Arch type: ${OSARCH}"
+    exit_with_error 2 "Unsupported OS type: ${OSTYPE}"
     ;;
   esac
 }
