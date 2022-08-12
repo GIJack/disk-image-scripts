@@ -241,8 +241,10 @@ _init_image() {
     as_root pacstrap "${mount_point}" ${KERNEL} ${BOOTLOADER} ${ARCH_BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file} || exit_with_error 1 "Base Arch Linux install failed. Please check output."
     ;;
    debian)
+    # check if debootstrap is installed
+    which debootstrap &> /dev/null || exit_with_error 2 "debootstrap is not installed, may not initialize Debian based environments"
     # debootstrap needs a comma seperated list of packages
-    local deb_packages=$( tr ' ' ',' <<< "${KERNEL} ${BOOTLOADER} ${DEB_BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file}" )
+    local deb_packages=$( tr ' ' ',' <<< "${KERNEL} ${BOOTLOADER} ${DEB_BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file}" )    
     as_root debootstrap --arch ${PROJECTARCH} "${DEBDISTRO}" "${mount_point}" --include="${deb_packages}" || exit_with_error 1 "Base Debian install failed. Please check output."
     ;;
    *)
