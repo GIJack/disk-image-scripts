@@ -15,7 +15,7 @@ BASE_IMAGE="base-install.img"
 TEMPLATE_INDEX="template.rc"
 IMGSIZE=20480 # 20GB
 ARCH_BASE_PACKAGES="base cloud-init cloud-guest-utils openssh mkinitcpio"
-DEB_BASE_PACKAGES="cloud-init cloud-guest-utils openssh-server initramfs-tools"
+DEB_BASE_PACKAGES="cloud-init cloud-initramfs-growroot cloud-guest-utils openssh-server initramfs-tools"
 BASE_SYSTEM_SERVICES="sshd cloud-init-local cloud-init cloud-config cloud-final"
 BASE_INITRAMDISK_MODULES="virtio virtio_pci virtio_blk virtio_net virtio_ring"
 SCRIPT_BASE_DIR="/usr/share/disk-image-scripts"
@@ -244,8 +244,8 @@ _init_image() {
     # check if debootstrap is installed
     which debootstrap &> /dev/null || exit_with_error 2 "debootstrap is not installed, may not initialize Debian based environments"
     # debootstrap needs a comma seperated list of packages
-    local deb_packages=$( tr ' ' ',' <<< "${KERNEL} ${BOOTLOADER} ${DEB_BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file}" )    
-    as_root debootstrap --arch ${PROJECTARCH} "${DEBDISTRO}" "${mount_point}" --include="${deb_packages}" || exit_with_error 1 "Base Debian install failed. Please check output."
+    local deb_packages=$( tr ' ' ',' <<< " ${KERNEL} ${BOOTLOADER} ${DEB_BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file}" )    
+    as_root debootstrap --arch=${PROJECTARCH} --include="${deb_packages}" "${DEBDISTRO}" "${mount_point}" "${DEBMIRROR}" || exit_with_error 1 "Base Debian install failed. Please check output."
     ;;
    *)
     exit_with_error 2 "Unsupported OS type: ${OSTYPE}"
@@ -335,7 +335,7 @@ _compile_template(){
     outfile_name="${outfile_generic}"
   fi
 
-  ## Generate final init.arch.local
+  ## Generate final init.local
   touch "${TARGET}/init.conf" || exit_with_error 1 "Could not write to target, please check permissions."
   cat > "${TARGET}/init.conf" << EOF
 OSTYPE=${OSTYPE}
