@@ -172,6 +172,8 @@ main() {
   local -i exit_code=0
   [[ $1 == "help" || $1 == "--help" ]] && help_and_exit
   message "Initalizing..."
+  # set shell variables inside chroot, this should make this portable
+  source /etc/profile
   if [ -f "${local_config}" ];then
     message "parsing ${local_config}"
     parse_environment "${local_config}"
