@@ -132,6 +132,7 @@ install_extlinux() {
   extlinux -i /boot/syslinux || exit_n+=1
   
   [ $exit_n -ne $0 ] && return 1
+  return 0
 }
 
 enable_services() {
@@ -141,9 +142,13 @@ enable_services() {
 }
 
 config_initramdisk() {
-  submsg "Rebuilding Initial Ramdisk"
-  dpkg-reconfigure --frontend=noninteractive ${KERNEL}
-  return ${?}
+  submsg "Reconfiguring Kernel and Rebuilding Initial Ramdisk"
+  local exit_n=0
+  dpkg-reconfigure --frontend=noninteractive ${KERNEL} || exit_n+=${?}
+  update-initramfs -u || exit_n+=${?}
+
+  [ ${exit_n} -ne 0 ] && return 1
+  return 0
 }
 
 config_misc() {
