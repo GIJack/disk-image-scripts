@@ -238,6 +238,8 @@ _init_image() {
 
   case ${OSTYPE} in
    arch)
+    # check if pacstrap is installed
+    which pacstrap &> /dev/null || exit_with_error 2 "pacstrap is not installed, may not initialize Debian based environments"
     as_root pacstrap "${mount_point}" ${KERNEL} ${BOOTLOADER} ${ARCH_BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file} || exit_with_error 1 "Base Arch Linux install failed. Please check output."
     ;;
    debian)
@@ -286,12 +288,13 @@ _image_shell(){
   mount_target=${mount_dev: -3:1}
 
   # Run command
+  # Don't let the name fool you, arch-chroot also works on debian
   if [ -z "${command}" ];then
     message "Opening shell in base install"
-    as_root arch-chroot "${mount_point}"
+    as_root arch-chroot "${mount_point}" || warn "Shell failed!"
    else
     message "Running ${command} in base install"
-    as_root arch-chroot "${mount_point}" "${command}"
+    as_root arch-chroot "${mount_point}" "echo ${command} > /cmd.sh" "chmod +x /cmd.sh" "/cmd.sh" "shred -u"
   fi
   
   # Cleanup
