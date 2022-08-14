@@ -122,7 +122,8 @@ install_syslinux() {
   sed -i s/sda3/${root_part}/g /boot/syslinux/syslinux.cfg || exit_n+=1
   sed -i s/initramfs-linux/initramfs-${KERNEL}/g /boot/syslinux/syslinux.cfg || exit_n+=1
   sed -i s/vmlinuz-linux/vmlinuz-${KERNEL}/g /boot/syslinux/syslinux.cfg || exit_n+=1
-  return ${exit_n}
+
+  [ $exit_n -ne $0 ] && return 1
 }
 
 enable_services() {
@@ -146,7 +147,12 @@ config_misc() {
   submsg "Misc Config"
   touch /etc/machine-id
   # Use timezone module to set Timezone from config
+  rm -f /etc/localtime
   ln -sf "/usr/share/zoneinfo/${TIMEZONE}" /etc/localtime
+  if [ ${?} -ne 0 ];then
+    warn "Could not set timezone: ${TIMEZONE}, check that it exists"
+    return 1
+  fi
 }
 
 run_user_script(){
