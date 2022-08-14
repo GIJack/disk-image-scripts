@@ -122,33 +122,40 @@ install_packages() {
   return $?
 }
 
-install_syslinux() {
-  submsg "Configuring Syslinux Bootloader"
+# debian edition
+install_extlinux() {
+  submsg "Configuring Extlinux Bootloader"
   local -i exit_n=0
-  #TODO: Figure out debian specific modifications
-  #sed -i s/sda3/${root_part}/g /boot/syslinux/syslinux.cfg || exit_n+=1
-  #sed -i s/initramfs-linux/initramfs-${KERNEL}/g /boot/syslinux/syslinux.cfg || exit_n+=1
-  #sed -i s/vmlinuz-linux/vmlinuz-${KERNEL}/g /boot/syslinux/syslinux.cfg || exit_n+=1
-  #syslinux-install_update -i -a -m || exit_n+=1
-  return ${exit_n}
+  mkdir -p /boot/syslinux
+  cp /usr/lib/syslinux/modules/bios/* /boot/syslinux || exit_n+=1
+  mv /root/syslinux.cfg /boot/syslinux/syslinux.cfg || exit_n+=1
+  extlinux -i /boot/syslinux || exit_n+=1
+  
+  [ $exit_n -ne $0 ] && return 1
 }
 
 enable_services() {
   submsg "Enabling Systemd Units"
   systemctl enable ${system_services} ${SYSTEMSERVICES}
-  return $?
+  return {$?}
 }
 
 config_initramdisk() {
   submsg "Rebuilding Initial Ramdisk"
   dpkg-reconfigure --frontend=noninteractive ${KERNEL}
+  return ${?}
 }
 
 config_misc() {
   submsg "Misc Config"
   touch /etc/machine-id
   # Use timezone module to set Timezone from config
+  rm -f /etc/localtime
   ln -sf "/usr/share/zoneinfo/${TIMEZONE}" /etc/localtime
+  if [ ${?} -ne 0 ];then
+    warn "Could not set timezone: ${TIMEZONE}, check that it exists"
+    return 1
+  fi
 }
 
 run_user_script(){
@@ -161,21 +168,26 @@ main() {
   local -i exit_code=0
   [[ $1 == "help" || $1 == "--help" ]] && help_and_exit
   message "Initalizing..."
+  # set shell variables on debian
+  source /etc/profile
   if [ -f "${local_config}" ];then
     parse_environment "${local_config}"
    else
     warn "${local_config} not found!, default is in /usr/share/disk-image-scripts/init.arch.config"
   fi
-  #install_packages || exit_with_error 1 "Could not install necessary packages needed for script to run. Please check install"
-  enable_services     || exit_code+=1 ; warn "Systemctl enabled failed"
-  config_initramdisk  || exit_code+=1 ; warn "Initcpio config failed"
-  config_misc         || exit_code+=1 ; warn "Misc config failed"
-  run_user_script     || exit_code+=1 ; warn "Local user script fails"
   
   dpkg-reconfigure --frontend=noninteractive ${BOOTLOADER}
   case ${BOOTLOADER} in
-   syslinux)
-    install_syslinux || exit_code+=1; warn "Syslinux install failed"
+   *extlinux*)
+    install_extlinux
+    if [ ${?} -ne 0 ];then
+      exit_code+=1
+      warn "extlinux install failed"
+    fi
+    ;;
+   *syslinux*)
+    warn "Use extlinux for Debian instead of syslinux. Bootloader not configured"
+    exit_code+=1
     ;;
    *)
     warn "Bootloader ${BOOTLOADER} is unsupported, NO INSTALLED BOOTLOADER CONFIGURED!"
@@ -183,6 +195,16 @@ main() {
     ;;
   esac
 
+  # now run hooks
+  local item_list="enable_services config_initramdisk config_misc run_user_script"
+  for item in $item_list;do
+    ${item}
+    if [ $? -ne 0 ];then
+      exit_code+=1
+      warn "${item} failed"
+    fi
+  done
+  
   message "Done!"
   [ $exit_code -ne 0 ] && exit_with_error 1 "${exit_code} errrors, check above output"
 }

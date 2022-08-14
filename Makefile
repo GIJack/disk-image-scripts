@@ -5,6 +5,8 @@ install:
 	install -Dm 755 init_image.sh "$(DESTDIR)/$(PREFIX)/bin/init_image.sh"
 	install -Dm 755 gen_cloud_template.sh "$(DESTDIR)/$(PREFIX)/bin/gen_cloud_template.sh"
 	install -Dm 755 autorun/init.arch.sh "$(DESTDIR)/usr/share/disk-image-scripts/init.arch.sh"
+	install -Dm 755 autorun/init.debian.sh "$(DESTDIR)/usr/share/disk-image-scripts/init.debian.sh"
+	install -Dm 644 misc/debian-syslinux.cfg "$(DESTDIR)/usr/share/disk-image-scripts/debian-syslinux.cfg"
 	install -Dm 644 bash_completion/mount_image.bash "$(DESTDIR)/usr/share/bash-completion/completions/mount_image.sh"
 	install -Dm 644 bash_completion/gen_cloud_template.bash "$(DESTDIR)/usr/share/bash-completion/completions/gen_cloud_template.sh"
 	install -Dm 644 man/init_image.1 "$(DESTDIR)/$(PREFIX)/share/man/man1/init_image.1"

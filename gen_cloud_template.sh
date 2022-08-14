@@ -15,7 +15,7 @@ BASE_IMAGE="base-install.img"
 TEMPLATE_INDEX="template.rc"
 IMGSIZE=20480 # 20GB
 ARCH_BASE_PACKAGES="base cloud-init cloud-guest-utils openssh mkinitcpio"
-DEB_BASE_PACKAGES="cloud-init cloud-initramfs-growroot cloud-guest-utils openssh-server initramfs-tools"
+DEB_BASE_PACKAGES="cloud-init cloud-initramfs-growroot cloud-guest-utils openssh-server initramfs-tools locales-all"
 BASE_SYSTEM_SERVICES="sshd cloud-init-local cloud-init cloud-config cloud-final"
 BASE_INITRAMDISK_MODULES="virtio virtio_pci virtio_blk virtio_net virtio_ring"
 SCRIPT_BASE_DIR="/usr/share/disk-image-scripts"
@@ -362,19 +362,30 @@ EOF
   mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
   mount_target=${mount_dev: -3:1}
 
-  # copy template
+  # copy root overlay and image init scripts
   submsg "Copying Overlay..."
   if [ -d "${TARGET}/rootoverlay/" ];then
     as_root cp -r "${TARGET}"/rootoverlay/* "${mount_point}/" || warn "Could not copy root overlay. If rootoverlay/ is empty you can ignore this."
   fi
-  as_root cp "${SCRIPT_BASE_DIR}/init.${OSTYPE}.sh" "${mount_point}" || warn "Could not copy initialization script to chroot!"
-  as_root cp "${TARGET}/init.conf" "${mount_point}" || exit_with_error 1 "Could not copy initialization config to chroot!"
+  if [ -f "${SCRIPT_BASE_DIR}/init.${OSTYPE}.sh" ];then
+    as_root cp "${SCRIPT_BASE_DIR}/init.${OSTYPE}.sh" "${mount_point}" || warn "Could not copy initialization script to chroot!"
+   else
+    mount_image.sh umount ${mount_target} || warn "Unmount failed, please check"
+    exit_with_error 1 "No initialization script for your OS Type: ${OSTYPE}. Image will not work"
+  fi
+  as_root cp "${TARGET}/init.conf" "${mount_point}" || warn 1 "Could not copy initialization config to chroot!"
   if [ -f "${TARGET}/init.${OSTYPE}.local.sh" ];then
     as_root cp "${TARGET}/init.${OSTYPE}.local.sh" "${mount_point}" || warn "Could not copy local initializtion script to chroot!"
   fi
+  
+  # OS Specific file copy
+  if [ "${OSTYPE}" == "debian" ];then
+    as_root install -Dm 644 "${SCRIPT_BASE_DIR}/debian-syslinux.cfg" "${mount_point}/root/syslinux.cfg"
+  fi
+  
   # initialize with script
   submsg "Running Initalization Script..."
-  as_root arch-chroot "${mount_point}" "bash /init.arch.sh" || warn "Initialization failed!"
+  as_root arch-chroot "${mount_point}" "bash /init.${OSTYPE}.sh" || warn "Initialization failed!"
   
   # Cleanup
   submsg "Cleanup"
@@ -395,9 +406,13 @@ EOF
   mount_image.sh mount -m "${mount_point}" "${TARGET}/${outfile_name}" || exit_with_error 1 "Could not mount on ${mount_point}, quitting."
   mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
   mount_target=${mount_dev: -3:1}
+  
   case ${BOOTLOADER} in
    *syslinux*)
     as_root arch-chroot "${mount_point}" "syslinux-install_update -u -a -m" || warn "syslinux re-initialization failed"
+    ;;
+   *extlinux*)
+    as_root arch-chroot "${mount_point}" "extlinux -U /boot" || warn "extlinux re-initialization failed"
     ;;
    *)
     warn "Bootloader unsupported, skipping.."
