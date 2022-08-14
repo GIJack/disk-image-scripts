@@ -51,8 +51,9 @@ FILESYSTEM="ext4"
 KERNEL="linux-lts" # Arch Linux
 #KERNEL="linux-image-cloud-amd64" # Debian-based
 
-# As of now, only syslinux is supported. Added for future compatibility
-BOOTLOADER="syslinux"
+# As of now, only syslinux(extlinux) is supported. Added for future compatibility
+BOOTLOADER="syslinux" # Use for Arch Linux
+#BOOTLOADER="extlinux" # Use for Debian
 
 # List of additional services to enable.
 SYSTEMSERVICES=""
