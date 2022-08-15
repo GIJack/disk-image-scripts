@@ -123,7 +123,7 @@ install_syslinux() {
   sed -i s/initramfs-linux/initramfs-${KERNEL}/g /boot/syslinux/syslinux.cfg || exit_n+=1
   sed -i s/vmlinuz-linux/vmlinuz-${KERNEL}/g /boot/syslinux/syslinux.cfg || exit_n+=1
 
-  [ $exit_n -ne $0 ] && return 1
+  [ $exit_n -ne 0 ] && return 1
   return 0
 }
 

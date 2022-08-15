@@ -131,7 +131,7 @@ install_extlinux() {
   mv /root/syslinux.cfg /boot/syslinux/syslinux.cfg || exit_n+=1
   extlinux -i /boot/syslinux || exit_n+=1
   
-  [ $exit_n -ne $0 ] && return 1
+  [ $exit_n -ne 0 ] && return 1
   return 0
 }
 
