@@ -413,12 +413,14 @@ EOF
   mount_dev=$(grep "${mount_point}" /proc/mounts| cut -d " " -f 1)
   mount_target=${mount_dev: -3:1}
   
+  #This is very kludgy. syslinux is the name of the package in Arch, extlinux in Debian, they are the same thing.
+  # syslinux-install_update is an Arch specific script. Unknown how this will work with redhat and/or grub
   case ${BOOTLOADER} in
    *syslinux*)
     as_root arch-chroot "${mount_point}" "syslinux-install_update -u -a -m" || warn "syslinux re-initialization failed"
     ;;
    *extlinux*)
-    as_root arch-chroot "${mount_point}" "extlinux -U /boot" || warn "extlinux re-initialization failed"
+    as_root arch-chroot "${mount_point}" "extlinux -U /boot/syslinux" || warn "extlinux re-initialization failed"
     ;;
    *)
     warn "Bootloader unsupported, skipping.."
