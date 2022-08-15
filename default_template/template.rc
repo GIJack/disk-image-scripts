@@ -2,7 +2,7 @@
 
 # Metadata and defaults file for Disk-Image-Script's gen_cloud_template.sh
 # This will overwrite anything in init.arch.local.
-# supported values are "arch" and "debian"
+# supported values are "arch", "debian", and "redhat"
 OSTYPE="arch"
 
 FILEFORMAT=0

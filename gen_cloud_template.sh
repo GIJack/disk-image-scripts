@@ -249,6 +249,10 @@ _init_image() {
     local deb_packages=$( tr ' ' ',' <<< " ${KERNEL} ${BOOTLOADER} ${DEB_BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file}" )    
     as_root debootstrap --arch=${PROJECTARCH} --include="${deb_packages}" "${DEBDISTRO}" "${mount_point}" "${DEBMIRROR}" || exit_with_error 1 "Base Debian install failed. Please check output."
     ;;
+   redhat)
+     #TODO: Write Redhat support
+     exit_with_error 10 "Redhat support is incomplete, will not run"
+    ;;
    *)
     exit_with_error 2 "Unsupported OS type: ${OSTYPE}"
   esac
@@ -381,6 +385,8 @@ EOF
   # OS Specific file copy
   if [ "${OSTYPE}" == "debian" ];then
     as_root install -Dm 644 "${SCRIPT_BASE_DIR}/debian-syslinux.cfg" "${mount_point}/root/syslinux.cfg"
+   elif [ "${OSTYPE}" == "redhat" ];then
+    warn "Not RH specific code, yet..."
   fi
   
   # initialize with script
