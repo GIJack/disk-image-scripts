@@ -15,6 +15,7 @@ warn(){
 
 main() {
   # code goes here
+  message "Running user run-once code for intializing template"
   exit 0
 }
 
