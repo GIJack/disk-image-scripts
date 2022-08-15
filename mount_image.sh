@@ -79,7 +79,7 @@ _umount-img() {
 
   message "UnMounting ${MOUNT_POINT} from ${loop_dev}"
 
-  as_root umount ${loop_dev}p${PART_N} || local_exit+=1
+  as_root umount -Rf ${loop_dev}p${PART_N} || local_exit+=1
   as_root losetup -d ${loop_dev} || local_exit+=1
 
   return ${local_exit}
