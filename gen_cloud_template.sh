@@ -247,7 +247,10 @@ _init_image() {
     which debootstrap &> /dev/null || exit_with_error 2 "debootstrap is not installed, may not initialize Debian based environments"
     # debootstrap needs a comma seperated list of packages
     local deb_packages=$( tr ' ' ',' <<< " ${KERNEL} ${BOOTLOADER} ${DEB_BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file}" )    
-    as_root debootstrap --arch=${PROJECTARCH} --include="${deb_packages}" "${DEBDISTRO}" "${mount_point}" "${DEBMIRROR}" || exit_with_error 1 "Base Debian install failed. Please check output."
+    as_root debootstrap --arch=${PROJECTARCH} --include="${deb_packages}" "${DEBDISTRO}" "${mount_point}" "${DEBMIRROR}" || warn "Debian base install threw a code, however there is a known bug(878961). We implement a workarounnd" #|| exit_with_error 1 "Base Debian install failed. Please check output."
+    # work around for debootstrap not being able to handle virtualpackages
+    # Bug: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=878961
+    as_root arch-chroot "${mount_point}" apt -y --fix-broken install || exit_with_error 1 "Workaround for bug 878961 failed"
     ;;
    redhat)
      #TODO: Write Redhat support
@@ -298,7 +301,7 @@ _image_shell(){
     as_root arch-chroot "${mount_point}" || warn "Shell failed!"
    else
     message "Running ${command} in base install"
-    as_root arch-chroot "${mount_point}" "echo ${command} > /cmd.sh" "chmod +x /cmd.sh" "/cmd.sh" "shred -u"
+    as_root arch-chroot "${mount_point}" ${command}
   fi
   
   # Cleanup
