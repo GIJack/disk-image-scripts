@@ -12,14 +12,14 @@ System requirements:
 Right now, only MBR partitioning and ext4 filesystem are supported. In the
 future we may support GPT paritioning and xfs filesystems as well.
 
-This is intended for installing Arch Linux systems in files instead of disks,
+This is intended for installing Arch and Debian systems in files instead of disks,
 and working with and maintaining these installs. works hand in hand with
 arch-chroot from install-scripts in Arch Linux.
 
-Debian support via debootstrap is being added
-
 This is particularly useful if making an image for the cloud or other virtual
 machine systems.
+
+Support for RedHat is in the planning stage
 
 Scripts:
 --------
