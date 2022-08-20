@@ -15,9 +15,9 @@ KERNEL="linux-image"
 # Hardcoded always install packages
 local_config="/init.conf"
 # packages that need to be installed
-system_packages="cloud-init cloud-utils openssh-server"
+system_packages="cloud-init cloud-initramfs-growroot cloud-guest-utils openssh-server initramfs-tools locales-all"
 # systemd services that need to be enabled
-system_services="networking sshd cloud-init-local cloud-init cloud-config cloud-final"
+system_services="networking ssh cloud-init-local cloud-init cloud-config cloud-final"
 # kernel modules that get added to /etc/mkinitcpio
 initcpio_modules="virtio virtio_pci virtio_blk virtio_net virtio_ring"
 # block device parition with root fs, minus the /dev/ part
@@ -125,11 +125,20 @@ install_packages() {
 # debian edition
 install_extlinux() {
   local -i exit_n=0
+  # Root partition detection. Assumes using a loop device with /dev/loop that
+  # numbers partitions /dev/loop0p1 and such
+  local root_mount=$(df / | tail -1 |cut -d " " -f 1) # location where / is mounted
+  local N=${#root_mount} # count the characters in the string
+  local root_part_n=${root_mount:${N}-1:1} # get the partition number
+  local root_dev=${root_mount:0:-2} # /'s device.
+
   submsg "Configuring Extlinux Bootloader"
+  
   apt install -y syslinux-common || return 1
   mkdir -p /boot/syslinux
   cp /usr/lib/syslinux/modules/bios/* /boot/syslinux || exit_n+=1
   mv /root/syslinux.cfg /boot/syslinux/syslinux.cfg || exit_n+=1
+  sfdisk -A ${root_dev} ${root_part_n} || exit_n+=1
   extlinux -i /boot/syslinux || exit_n+=1
   
   [ $exit_n -ne 0 ] && return 1
@@ -139,7 +148,7 @@ install_extlinux() {
 enable_services() {
   submsg "Enabling Systemd Units"
   systemctl enable ${system_services} ${SYSTEMSERVICES}
-  return {$?}
+  return ${?}
 }
 
 config_initramdisk() {
