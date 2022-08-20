@@ -12,6 +12,10 @@ warn(){
   echo 1>&2 "Cloud Image Init: WARN: ${@}"
 }
 
+exit_with_error(){
+  echo 1>&2 "Cloud Image Init: ERROR: ${2}"
+  exit ${1}
+}
 
 main() {
   # code goes here
