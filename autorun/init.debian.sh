@@ -124,8 +124,9 @@ install_packages() {
 
 # debian edition
 install_extlinux() {
-  submsg "Configuring Extlinux Bootloader"
   local -i exit_n=0
+  submsg "Configuring Extlinux Bootloader"
+  apt install -y syslinux-common || return 1
   mkdir -p /boot/syslinux
   cp /usr/lib/syslinux/modules/bios/* /boot/syslinux || exit_n+=1
   mv /root/syslinux.cfg /boot/syslinux/syslinux.cfg || exit_n+=1
