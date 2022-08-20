@@ -1,6 +1,10 @@
 # disk-image-scripts
-A collection of shell scripts for working with raw disk image .img files with
-bootable systems inside. Assumed that:
+
+Generate virtual machine template images for the cloud, and tools for working
+on .img files locally for upload.
+
+Shell scripts for working with raw disk image .img files with bootable systems
+inside. Assumed that:
 1. Formatted with an MBR paritioning scheme and boot record.
 2. contains a single parition filling the entire drive, formated with a FS
 
@@ -28,8 +32,10 @@ filesystem
 
 mount\_image.sh - mount or unmount a previously made image
 
-gen\_cloud\_template.sh - generate a cloud template images based on a profile.
-see --help for more information
+gen\_cloud\_template.sh - generate a cloud virtual machine template images.
+Designed for work with digital ocean, and programs like harbor-wave, but should
+be convertable into an AMI for Amazon, but this has not been tested and not
+supported. see --help for more information
 
 shrinkwrap\_image.sh - reduce an .img to its smallest possible size. Especially
 for export.
