@@ -381,8 +381,8 @@ EOF
     exit_with_error 1 "No initialization script for your OS Type: ${OSTYPE}. Image will not work"
   fi
   as_root cp "${TARGET}/init.conf" "${mount_point}" || warn 1 "Could not copy initialization config to chroot!"
-  if [ -f "${TARGET}/init.${OSTYPE}.local.sh" ];then
-    as_root cp "${TARGET}/init.${OSTYPE}.local.sh" "${mount_point}" || warn "Could not copy local initializtion script to chroot!"
+  if [ -f "${TARGET}/init.local.sh" ];then
+    as_root cp "${TARGET}/init.local.sh" "${mount_point}" || warn "Could not copy local initializtion script to chroot!"
   fi
   
   # OS Specific file copy
