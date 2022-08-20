@@ -147,6 +147,8 @@ install_extlinux() {
 
 enable_services() {
   submsg "Enabling Systemd Units"
+  #work around because debian wants the sshd service named ssh and not sshd
+  SYSTEMSERVICES=$(sed s/sshd/ssh/g <<< ${SYSTEMSERVICES})
   systemctl enable ${system_services} ${SYSTEMSERVICES}
   return ${?}
 }
