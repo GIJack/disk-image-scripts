@@ -43,6 +43,7 @@ Supported OSs:
 	---------------------------
 	arch		Arch Linux	 - https://archlinux.org
 	debian		Debian GNU/Linux - https://debian.org
+	redhat		Red Hat based: Fedora, RHEL, Oracle, etc...
 
 FILEFORMAT		Interger with what version of this spec this is using.
 Known Versions:
