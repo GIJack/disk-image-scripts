@@ -76,7 +76,7 @@ _umount-img() {
   local -i local_exit=0
   index=${1}
   local loop_dev=/dev/loop${index}
-  local loop_mount="$(cat /etc/mtab | grep ${loop_dev}p${PART_N} | cut -d ' ' -f 2 )"
+  local loop_mount="$(cat /proc/self/mounts | grep ${loop_dev}p${PART_N} | cut -d ' ' -f 2 )"
 
   message "UnMounting ${MOUNT_POINT} from ${loop_dev}"
 
