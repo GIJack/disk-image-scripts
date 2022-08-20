@@ -127,6 +127,7 @@ install_extlinux() {
   local -i exit_n=0
   # Root partition detection. Assumes using a loop device with /dev/loop that
   # numbers partitions /dev/loop0p1 and such
+  local mbr_file="/usr/lib/syslinux/mbr/mbr.bin"
   local root_mount=$(df / | tail -1 |cut -d " " -f 1) # location where / is mounted
   local N=${#root_mount} # count the characters in the string
   local root_part_n=${root_mount:${N}-1:1} # get the partition number
@@ -135,11 +136,12 @@ install_extlinux() {
   submsg "Configuring Extlinux Bootloader"
   
   apt install -y syslinux-common || return 1
-  mkdir -p /boot/syslinux
-  cp /usr/lib/syslinux/modules/bios/* /boot/syslinux || exit_n+=1
-  mv /root/syslinux.cfg /boot/syslinux/syslinux.cfg || exit_n+=1
-  sfdisk -A ${root_dev} ${root_part_n} || exit_n+=1
-  extlinux -i /boot/syslinux || exit_n+=1
+  mkdir -p /boot/syslinux || return 1 # create syslinux dir
+  cp /usr/lib/syslinux/modules/bios/* /boot/syslinux || exit_n+=1 # copy syslinux files
+  mv /root/syslinux.cfg /boot/syslinux/syslinux.cfg || exit_n+=1 # set config file
+  sfdisk -A ${root_dev} ${root_part_n} || exit_n+=1 # Mark partition as "active"
+  dd if="${mbr_file}" of=${root_dev} bs=440 count=1 || exit+=1 # Install MBR
+  extlinux -i /boot/syslinux || exit_n+=1 #Install rest of bootloader
   
   [ $exit_n -ne 0 ] && return 1
   return 0
@@ -176,8 +178,14 @@ config_misc() {
 }
 
 run_user_script(){
-  submsg "Running User Script"
-  bash /init.local.sh
+  submsg "Running Local Script"
+  local local_file="/init.local.sh"
+  
+  if [ ! -f ${local_file} ];then
+    warn "No local init file: ${local_file}, skipping"
+    return 0
+  fi
+  bash ${local_file}
   return ${?}
 }
 
