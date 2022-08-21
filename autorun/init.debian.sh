@@ -103,16 +103,16 @@ parse_environment(){
 
     # Zero check. If after cleaning either the key or value is null, then
     # write nothing
-    [ -z ${key} ] && continue
-    [ -z ${value} ] && continue
+    [ -z "${key}" ] && continue
+    [ -z "${value}" ] && continue
 
     # write sanitized values to temp file
     echo "${key}=${value}" >> ${safe_config}
   done
 
   #Now, we can import the cleaned config and then delete it.
-  source ${safe_config}
-  rm -f ${safe_config}
+  source "${safe_config}"
+  rm -f "${safe_config}"
 }
 
 install_packages() {

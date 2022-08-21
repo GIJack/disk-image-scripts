@@ -111,8 +111,8 @@ parse_environment(){
   done
 
   #Now, we can import the cleaned config and then delete it.
-  source ${safe_config}
-  rm -f ${safe_config}
+  source "${safe_config}"
+  rm -f "${safe_config}"
 }
 
 install_syslinux() {
