@@ -272,6 +272,9 @@ _update_image(){
    debian)
     _image_shell "apt update && apt upgrade"
     ;;
+   redhat)
+    _image_shell "yum update"
+    ;;
    *)
     exit_with_error 2 "Unsupported OS type: ${OSTYPE}"
     ;;
