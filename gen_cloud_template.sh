@@ -270,7 +270,8 @@ _update_image(){
     _image_shell "pacman -Syu"
     ;;
    debian)
-    _image_shell "apt update && apt upgrade"
+   # Nasty kludge that we can't get both to run in the same choort.
+    _image_shell "apt update" "apt upgrade"
     ;;
    redhat)
     _image_shell "yum update"
@@ -287,9 +288,8 @@ _image_shell(){
   local mount_point="$(mktemp -d)"
   local mount_dev=""
   local mount_target=""
-  local command=""
-  [ ! -z "${1}" ] && command="${1}"
-
+  local commands=""
+  [ ! -z "${1}" ] && commands=("${@}")
   [ ! -f "${TARGET}/${BASE_IMAGE}" ] && exit_with_error 1 "Base install cannot be found. perhaps you forgot to init-image?"
   
   # Set up mount and get unmount data
@@ -299,12 +299,14 @@ _image_shell(){
 
   # Run command
   # Don't let the name fool you, arch-chroot also works on debian
-  if [ -z "${command}" ];then
+  if [ -z "${commands}" ];then
     message "Opening shell in base install"
     as_root arch-chroot "${mount_point}" || warn "Shell failed!"
    else
-    message "Running ${command} in base install"
-    as_root arch-chroot "${mount_point}" ${command}
+    message "Running \"${commands[@]}\" in base install"
+    for cmd in "${commands[@]}";do
+      as_root arch-chroot "${mount_point}" "${cmd}"
+    done
   fi
   
   # Cleanup
