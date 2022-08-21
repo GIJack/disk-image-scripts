@@ -386,11 +386,14 @@ EOF
   fi
   
   # OS Specific file copy
-  if [ "${OSTYPE}" == "debian" ];then
+  case ${OSTYPE} in
+   debian)
     as_root install -Dm 644 "${SCRIPT_BASE_DIR}/debian-syslinux.cfg" "${mount_point}/root/syslinux.cfg"
-   elif [ "${OSTYPE}" == "redhat" ];then
+    ;;
+   redhat)
     warn "Not RH specific code, yet..."
-  fi
+    ;;
+  esac
   
   # initialize with script
   submsg "Running Initalization Script..."
