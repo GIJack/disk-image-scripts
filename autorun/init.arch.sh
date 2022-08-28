@@ -134,26 +134,31 @@ enable_services() {
 }
 
 config_initcpio() {
-  local -i exit_n=0
+  local -i errors=0
   submsg "Updating mkinitcpio"
   # add extra modules from local file
   initcpio_modules+=" "
   initcpio_modules+=${EXTRAINTMODULES}
-  sed -i s/"MODULES=()"/"MODULES=(${initcpio_modules})"/g /etc/mkinitcpio.conf || exit_n+=1
-  mkinitcpio -p ${KERNEL} || exit_n+=1
-  return ${exit_n}
+  sed -i s/"MODULES=()"/"MODULES=(${initcpio_modules})"/g /etc/mkinitcpio.conf || errors+=1
+  mkinitcpio -p ${KERNEL} || errors+=1
+
+  [ ${errors} -ne 0 ] && return 1
+  return 0
 }
 
 config_misc() {
+  local -i errors=0
   submsg "Misc Config"
-  touch /etc/machine-id
+  touch /etc/machine-id || errors+=1
   # Use timezone module to set Timezone from config
   rm -f /etc/localtime
   ln -sf "/usr/share/zoneinfo/${TIMEZONE}" /etc/localtime
   if [ ${?} -ne 0 ];then
     warn "Could not set timezone: ${TIMEZONE}, check that it exists"
-    return 1
+    errors+=1
   fi
+  [ ${errors} -ne 0 ] && return 1
+  return 0
 }
 
 run_user_script(){
