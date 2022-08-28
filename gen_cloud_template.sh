@@ -22,7 +22,7 @@ SCRIPT_BASE_DIR="/usr/share/disk-image-scripts"
 PACKAGE_LIST_FILE="addedpacks"
 COMPRESS_IMAGE="Y"
 TIMEZONE="UTC"
-VALID_OS_TYPES="arch debian"
+VALID_OS_TYPES="arch debian ubuntu"
 DEBMIRROR="http://deb.debian.org/debian/"
 DEBDISTRO="stable"
 # /Defaults #
@@ -242,7 +242,7 @@ _init_image() {
     which pacstrap &> /dev/null || exit_with_error 2 "pacstrap is not installed, may not initialize Debian based environments"
     as_root pacstrap "${mount_point}" ${KERNEL} ${BOOTLOADER} ${ARCH_BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file} || exit_with_error 1 "Base Arch Linux install failed. Please check output."
     ;;
-   debian)
+   debian|ubuntu)
     # check if debootstrap is installed
     which debootstrap &> /dev/null || exit_with_error 2 "debootstrap is not installed, may not initialize Debian based environments"
     # debootstrap needs a comma seperated list of packages
@@ -269,7 +269,7 @@ _update_image(){
    arch)
     _image_shell "pacman -Syu"
     ;;
-   debian)
+   debian|ubuntu)
    # Nasty kludge that we can't get both to run in the same choort.
     _image_shell "apt update" "apt upgrade"
     ;;
@@ -392,7 +392,7 @@ EOF
   
   # OS Specific file copy
   case ${OSTYPE} in
-   debian)
+   debian|ubuntu)
     as_root install -Dm 644 "${SCRIPT_BASE_DIR}/debian-syslinux.cfg" "${mount_point}/root/syslinux.cfg"
     ;;
    redhat)
