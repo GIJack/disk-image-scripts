@@ -22,7 +22,7 @@ SCRIPT_BASE_DIR="/usr/share/disk-image-scripts"
 PACKAGE_LIST_FILE="addedpacks"
 COMPRESS_IMAGE="Y"
 TIMEZONE="UTC"
-VALID_OS_TYPES="arch debian ubuntu"
+VALID_OS_TYPES="arch debian redhat ubuntu"
 DEBMIRROR="http://deb.debian.org/debian/"
 DEBDISTRO="stable"
 # /Defaults #
