@@ -16,13 +16,16 @@ TEMPLATE_INDEX="template.rc"
 IMGSIZE=20480 # 20GB
 ARCH_BASE_PACKAGES="base cloud-init cloud-guest-utils openssh mkinitcpio"
 DEB_BASE_PACKAGES="cloud-init cloud-initramfs-growroot cloud-guest-utils openssh-server initramfs-tools locales-all"
+# redhat is wierd. groups and packages are installed seperately
+REDHAT_BASE_PACKAGES="openssh-server cloud-init"
+REDHAT_BASE_GROUPS="Base"
 BASE_SYSTEM_SERVICES="sshd cloud-init-local cloud-init cloud-config cloud-final"
 BASE_INITRAMDISK_MODULES="virtio virtio_pci virtio_blk virtio_net virtio_ring"
 SCRIPT_BASE_DIR="/usr/share/disk-image-scripts"
 PACKAGE_LIST_FILE="addedpacks"
 COMPRESS_IMAGE="Y"
 TIMEZONE="UTC"
-VALID_OS_TYPES="arch debian redhat ubuntu"
+VALID_OS_TYPES="arch debian centos redhat rocky oracle ubuntu"
 DEBMIRROR="http://deb.debian.org/debian/"
 DEBDISTRO="stable"
 # /Defaults #
@@ -252,9 +255,14 @@ _init_image() {
     # Bug: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=878961
     as_root arch-chroot "${mount_point}" apt -y --fix-broken install || exit_with_error 1 "Workaround for bug 878961 failed"
     ;;
-   redhat)
+   redhat|centos|rocky|oracle)
      #TODO: Write Redhat support
      exit_with_error 10 "Redhat support is incomplete, will not run"
+     # Here be dragons
+     which yum &> /dev/null || exit_with_error 2 "yum is not installed, may not initialize Red Hat based environments"
+     # May or may not have to use --config= and/or --releasever
+     dnf --installroot="${mount_point}" --assumeyes groupinstall ${REDHAT_BASE_GROUPS}
+     dnf --installroot="${mount_point}" --assumeyes install ${KERNEL} ${BOOTLOADER} ${REDHAT_BASE_PACKAGES} ${packages_from_file}
     ;;
    *)
     exit_with_error 2 "Unsupported OS type: ${OSTYPE}"
@@ -273,7 +281,7 @@ _update_image(){
    # Nasty kludge that we can't get both to run in the same choort.
     _image_shell "apt update" "apt upgrade"
     ;;
-   redhat)
+   redhat|centos|rocky|oracle)
     _image_shell "yum update"
     ;;
    *)
@@ -395,8 +403,8 @@ EOF
    debian|ubuntu)
     as_root install -Dm 644 "${SCRIPT_BASE_DIR}/debian-syslinux.cfg" "${mount_point}/root/syslinux.cfg"
     ;;
-   redhat)
-    warn "Not RH specific code, yet..."
+   redhat|centos|rocky|oracle)
+    warn "No RH specific code, yet..."
     ;;
   esac
   
