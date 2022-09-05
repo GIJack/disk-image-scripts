@@ -41,9 +41,24 @@ OSTYPE			Name of Linux Distro. For use with cloud-init, and must
 Supported OSs:
 	Value		Description
 	---------------------------
-	arch		Arch Linux	 - https://archlinux.org
+	arch		Arch Linux - https://archlinux.org
 	debian		Debian GNU/Linux - https://debian.org
-	redhat		Red Hat based: Fedora, RHEL, Oracle, etc...
+	redhat		Redhat Linux - https://redhat.org
+
+OSTYPE Synonyms: Use a downstream distro that is based on a parent distro
+listed above. Uses same codepaths, but with another name.
+
+	Base		Synonyms
+	------------------------
+	debian		ubuntu
+	redhat		centos rocky oracle
+
+	Value		Description
+	---------------------------
+	ubuntu	Ubuntu Linux https://ubuntu.com/
+	centos	Former Community RHEL clone, now owned by RH https://www.centos.org/
+	rocky	Community RHEL Clone. https://rockylinux.org/
+	oracle	RHEL clone by Oracle corporation. https://www.oracle.com/linux/
 
 FILEFORMAT		Interger with what version of this spec this is using.
 Known Versions:

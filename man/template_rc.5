@@ -46,9 +46,27 @@ Supported Distributions:
 .EX
 	Value	Description
 	-------------------
-	arch	Arch Linux	https://archlinux.org
-	debian	Debian-based	This can work with Debian, Ubuntu or anything
-	redhat	Redhat-based	Fedora, RHEL, Oracle, etc...
+	arch	Arch Linux - https://archlinux.org
+	debian	Debian GNU/Linux - https://debian.org
+	redhat	Redhat Linux - https://redhat.org
+.EE
+
+OSTYPE Synonyms: Use a downstream distro that is based on a parent distro
+listed above. Uses same codepaths, but with another name.
+.EX
+	Base	Synonyms
+	----------------
+	debian	ubuntu
+	redhat	centos rocky oracle
+.EE
+
+.EX
+	Value	Description
+	-------------------
+	ubuntu	Ubuntu Linux https://ubuntu.com/
+	centos	Former Community RHEL clone, now owned by RH https://www.centos.org/
+	rocky	Community RHEL Clone. https://rockylinux.org/
+	oracle	RHEL clone by Oracle corporation. https://www.oracle.com/linux/
 .EE
 
 \fBFILEFORMAT\fR		Interger with what version of this spec this is
