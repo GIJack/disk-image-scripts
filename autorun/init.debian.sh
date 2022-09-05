@@ -16,7 +16,7 @@ BOOTLOADER="extlinux"
 # Hardcoded always install packages
 local_config="/init.conf"
 # packages that need to be installed
-system_packages="cloud-init cloud-initramfs-growroot cloud-guest-utils openssh-server initramfs-tools locales-all"
+system_packages="openssh-server cloud-init"
 # systemd services that need to be enabled
 system_services="networking ssh cloud-init-local cloud-init cloud-config cloud-final"
 # kernel modules that get added to /etc/mkinitcpio
