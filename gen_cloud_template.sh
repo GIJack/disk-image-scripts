@@ -227,6 +227,7 @@ _init_image() {
   local mount_dev=""
   local mount_target=""
   local packages_from_file=""
+  [ "${PROJECTARCH}" == "any" ] && PROJECTARCH=$(uname -m) # if "Any" is used for archecture, use whatever the running kernel is compiled for
   [ -f ${PACKAGE_LIST_FILE} ] && packages_from_file=$( parse_package_file "${TARGET}/${PACKAGE_LIST_FILE}" )
 
   message "Performing Initial Install"
@@ -246,6 +247,7 @@ _init_image() {
     as_root pacstrap "${mount_point}" ${KERNEL} ${BOOTLOADER} ${ARCH_BASE_PACKAGES} ${EXTRAPACKAGES} ${packages_from_file} || exit_with_error 1 "Base Arch Linux install failed. Please check output."
     ;;
    debian|ubuntu)
+    [ "${PROJECTARCH}" == "x86_64" ] && PROJECTARCH="amd64" # Arch uses x86_64, the same output as uname -m. Debian calls this amd64. Debian substitution for "any" to work.
     # check if debootstrap is installed
     which debootstrap &> /dev/null || exit_with_error 2 "debootstrap is not installed, may not initialize Debian based environments"
     # debootstrap needs a comma seperated list of packages
