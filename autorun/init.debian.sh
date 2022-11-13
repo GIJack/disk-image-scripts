@@ -4,7 +4,7 @@
 # default user config. This is can be overridden in /etc/cloud/init.arch.conf
 
 # Name of kernel package
-KERNEL="linux-image"
+KERNEL="linux-image-cloud-amd64"
 
 # Name of bootloader. As of now, only extlinux is supported
 #BOOTLOADER="grub"??
