@@ -1,0 +1,68 @@
+#@CLOUD-TEMPLATE-PROFILE
+
+## Example for Debian
+
+# Metadata and defaults file for Disk-Image-Script's gen_cloud_template.sh
+# This will overwrite anything in init.arch.local.
+# supported values are "arch", "debian", and "redhat"
+OSTYPE="debian"
+
+FILEFORMAT=0
+COMPRESS_IMAGE="Y"
+COMPRESS_OPTS=""
+
+## Debian Specific Options
+# If OSTYPE is "debian", this can be specified
+DEBMIRROR="http://deb.debian.org/debian/"
+DEBDISTRO="stable"
+### Project Metadata ###
+
+# Name of project, version, and the OS Archecture. Arch follows same standards
+# As upstream Arch Linux. 0 and null versions will be ignored.
+PROJECT_NAME="Unknown Debian Project"
+PROJECT_VER=0
+PROJECT_ARCH="any"
+PROJECT_DESCRIPTION=""	# Optional
+
+# Name and Contact of maintainers. This section is optional
+AUTHOR_NAME="Unknown Author"
+AUTHOR_ORG="" #Organization
+AUTHOR_EMAIL=""
+AUTHOR_GPG_SIG="" # Must match AUTHOR_EMAIL
+# space seperated list of additional contact info in the format of
+# protocol:address. Example. for IRC use IRC:<NETWORK>:<NICK|IRC address>
+#AUTHOR_CONTACT="protocol1:address protocol2:instance:address"
+
+### /Project Metadata ###
+
+### System Info ###
+# This will overwrite init.arch.local
+
+# Size of initial image for base install. NOTE the final image gets reduced with
+# shrinkwrap to the smallest possible size
+#IMGSIZE=20480 # 20GB
+
+#Posix Timezone. Images created with this template will use this timezone. UTC
+# is the default. see timedatectl list-timezones for valid entries
+TIMEZONE="UTC"
+
+# Added for future compatibility. Does nothing, and EXT4 will always be used
+FILESYSTEM="ext4"
+
+# Name of kernel package. Default is Long Term Support Kernel "linux-lts"
+KERNEL="linux-image-cloud-amd64" # Debian-based
+
+# As of now, only extlinux(extlinux) is supported. Added for future compatibility
+BOOTLOADER="extlinux" # Use for Debian
+
+# List of additional services to enable.
+SYSTEMSERVICES=""
+
+# List of additional packages to install, beyond base. Text editors are not
+# provided by default. It would be wise to pick one
+EXTRAPACKAGES="nano"
+#EXTRA_PACKAGES="nano vi emacs-nox"
+
+# List of extra kernel modules to be included in the initcpio image
+EXTRAINTMODULES=""
+### /System Info ###
