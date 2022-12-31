@@ -346,7 +346,7 @@ _compile_template(){
     [ ${PROJECTARCH} == "any" -o ${PROJECTARCH} == "" ] && PROJECTARCH=$(uname -m)
     outfile_name+="${PROJECTARCH}_"
     # Project Version
-    if [[ ! -z ${PROJECTVER} && ${PROJECTVER} -ne 0 ]];then
+    if [[ ! -z ${PROJECTVER} && ${PROJECTVER} != "0" ]];then
       outfile_name+="${PROJECTVER}_"
      else
       # Datestamp. If there is no version, use a datestamp, ArchLinux style
