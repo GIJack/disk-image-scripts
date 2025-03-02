@@ -17,7 +17,7 @@ local_config="/init.conf"
 # packages that need to be installed
 system_packages="base cloud-init cloud-utils openssh mkinitcpio"
 # systemd services that need to be enabled
-system_services="systemd-networkd systemd-resolved sshd cloud-init-local cloud-init cloud-config cloud-final"
+system_services="systemd-networkd systemd-resolved sshd cloud-init-local cloud-init-main cloud-config cloud-final"
 # kernel modules that get added to /etc/mkinitcpio
 initcpio_modules="virtio virtio_pci virtio_blk virtio_net virtio_ring"
 # block device parition with root fs, minus the /dev/ part
