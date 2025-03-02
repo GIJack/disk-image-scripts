@@ -20,6 +20,7 @@ DEB_BASE_PACKAGES="cloud-init cloud-initramfs-growroot cloud-guest-utils openssh
 REDHAT_BASE_PACKAGES="openssh-server cloud-init"
 REDHAT_BASE_GROUPS="Base"
 BASE_SYSTEM_SERVICES="sshd cloud-init-local cloud-init-main cloud-config cloud-final"
+BASE_SYSTEM_SERVICES_ARCH="sshd cloud-init-local cloud-init-main cloud-config cloud-final"
 BASE_INITRAMDISK_MODULES="virtio virtio_pci virtio_blk virtio_net virtio_ring"
 SCRIPT_BASE_DIR="/usr/share/disk-image-scripts"
 PACKAGE_LIST_FILE="addedpacks"
