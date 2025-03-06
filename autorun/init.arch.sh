@@ -118,6 +118,10 @@ parse_environment(){
 install_syslinux() {
   submsg "Configuring Syslinux Bootloader"
   local -i exit_n=0
+  # As per wiki - March 2025
+  mkdir -p /boot/syslinux
+  cp /usr/lib/syslinux/bios/*.c32 /boot/syslinux/
+  extlinux --install /boot/syslinux
   syslinux-install_update -i -a -m || exit_n+=1
   sed -i s/sda3/${root_part}/g /boot/syslinux/syslinux.cfg || exit_n+=1
   sed -i s/initramfs-linux/initramfs-${KERNEL}/g /boot/syslinux/syslinux.cfg || exit_n+=1
